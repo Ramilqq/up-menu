@@ -14,11 +14,16 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        \Illuminate\Auth\Events\Registered::class => [
+        'Illuminate\Auth\Events\Registered' => [
             //\Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,
+            'App\Listeners\SendEmailVerificationListener',
         ],
-        \Laravel\Passport\Events\AccessTokenCreated::class => [
-            \App\Listeners\RevokeOldTokens::class,
+        'App\Events\EmployeeCreatedEvent' => [
+            'App\Listeners\SendEmailEmployeeLoginListener',
+        ],
+
+        'Laravel\Passport\Events\AccessTokenCreated' => [
+            'App\Listeners\RevokeOldTokens',
         ],
      
         'Laravel\Passport\Events\RefreshTokenCreated' => [

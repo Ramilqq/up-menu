@@ -1,26 +1,19 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\User;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-class RegisterRequest extends FormRequest
+class UserCreateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
         return true;
     }
-
-    //'first_name','last_name','email','password','project_id','phone','avatar','role','ip',
-    //'key' => ['required', 'numeric', 'unique:industries,key,'.$this->id],
+    
     public function rules()
     {
         
@@ -31,7 +24,8 @@ class RegisterRequest extends FormRequest
             'phone' => ['required', 'unique:users,phone', 'regex:/^(\+)([0-9]*)$/', 'max:16'],
             'password' => ['required', 'string', 'confirmed'],
             'ip' => ['required', 'string'],
-            'role' => ['required', 'string'],
+            'role' => ['required', 'string', 'in:'.User::ADMIN.','.User::USER],
+            'avatar' => ['image'],
             'project_id' => ['required', 'numeric']
         ];
     }
@@ -40,8 +34,7 @@ class RegisterRequest extends FormRequest
     {
         $this->merge([
             'ip' => request()->ip(),
-            'role' => User::OWNER,
-            'project_id' => 0
+            'project_id' => request()->user()->project_id ?: '',
         ]);
     }
 
@@ -53,5 +46,4 @@ class RegisterRequest extends FormRequest
          'data'      => $validator->errors()
        ]));
     }
-
 }

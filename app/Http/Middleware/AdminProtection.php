@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class EmailIsVerified
+class AdminProtection
 {
     /**
      * Handle an incoming request.
@@ -17,15 +17,12 @@ class EmailIsVerified
      */
     public function handle(Request $request, Closure $next)
     {
-        if (! $request->user() ||
-            (/*$request->user() instanceof MustVerifyEmail &&*/
-            ! $request->user()->hasVerifiedEmail())) {
-                return response()->json([
-                    'success' => 'false',
-                    'message' => __('auth.verified_email'),
-                ]);
+        if($request->user()->role != User::OWNER and $request->user()->role != User::ADMIN)
+        {
+            return response()->json([
+                'message' => 'Недостаточно прав.'
+            ]);
         }
-
         return $next($request);
     }
 }

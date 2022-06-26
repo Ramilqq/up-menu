@@ -33,7 +33,7 @@ class AuthServiceProvider extends ServiceProvider
         Passport::tokensExpireIn(now()->addMinute(30));
         Passport::refreshTokensExpireIn(now()->addDays(60));
 
-        VerifyEmail::toMailUsing(function ($notifiable, $url) {
+        /*VerifyEmail::toMailUsing(function ($notifiable, $url) {
             return (new MailMessage)->markdown('vendor/notifications/email', [
                 'greeting' => 'Привет!',
                 'actionText' => 'Подтвердить',
@@ -44,7 +44,7 @@ class AuthServiceProvider extends ServiceProvider
                 //'salutation' => $this->url,
                 'displayableActionUrl' => 'Ссылка',
             ]);
-        });
+        });*/
 
         
     }
