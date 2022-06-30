@@ -17,7 +17,7 @@ class OwnerProtection
      */
     public function handle(Request $request, Closure $next)
     {
-        if($request->user()->role != User::OWNER)
+        if($request->user()->role !== User::OWNER)
         {
             return response()->json([
                 'message' => 'Недостаточно прав.'

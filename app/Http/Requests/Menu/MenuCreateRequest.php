@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Menu;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Str;
 
-class LoginRequest extends FormRequest
+class MenuCreateRequest extends FormRequest
 {
-
     public function authorize()
     {
         return true;
@@ -17,16 +17,17 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'email', 'exists:users,email'],
-            'password' => ['required', 'string'],
-            'remember_me' => ['nullable', 'boolean'],
+            'uuid' => ['required', 'unique:menus,uuid'],
+            'project_id' => ['required', 'numeric', 'exists:projects,id'],
+            'name' => ['required', 'string', 'min:1', 'max:32'],
+            'active' => ['numeric'],
         ];
     }
 
     protected function prepareForValidation()
     {
         $this->merge([
-            //
+            'uuid' => Str::uuid()->toString(),
         ]);
     }
 
@@ -38,5 +39,4 @@ class LoginRequest extends FormRequest
          'data'      => $validator->errors()
        ])->setStatusCode(400));
     }
-
 }

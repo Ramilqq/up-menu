@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Order;
 
+use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
-class LoginRequest extends FormRequest
+class OrderUpdateRequest extends FormRequest
 {
-
     public function authorize()
     {
         return true;
@@ -17,9 +17,12 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'email', 'exists:users,email'],
-            'password' => ['required', 'string'],
-            'remember_me' => ['nullable', 'boolean'],
+            'project_id' => ['required', 'numeric', 'exists:projects,id'],
+            'table_id' => ['required', 'numeric', 'exists:tables,id'],
+            'user_id' => ['required', 'numeric', 'exists:users,id'],
+            'name' => ['required', 'string', 'min:1', 'max:32'],
+            'status' => ['required', 'string', 'in:'. Order::NEW.','.Order::WORK.','.Order::CLOSE.','.Order::PAID],
+            'sum' => ['required', 'numeric'],
         ];
     }
 
@@ -38,5 +41,4 @@ class LoginRequest extends FormRequest
          'data'      => $validator->errors()
        ])->setStatusCode(400));
     }
-
 }

@@ -9,18 +9,12 @@ use Illuminate\Contracts\Validation\Validator;
 
 class RegisterRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
+
     public function authorize()
     {
         return true;
     }
 
-    //'first_name','last_name','email','password','project_id','phone','avatar','role','ip',
-    //'key' => ['required', 'numeric', 'unique:industries,key,'.$this->id],
     public function rules()
     {
         
@@ -31,8 +25,7 @@ class RegisterRequest extends FormRequest
             'phone' => ['required', 'unique:users,phone', 'regex:/^(\+)([0-9]*)$/', 'max:16'],
             'password' => ['required', 'string', 'confirmed'],
             'ip' => ['required', 'string'],
-            'role' => ['required', 'string'],
-            'project_id' => ['required', 'numeric']
+            'role' => ['required', 'string']
         ];
     }
 
@@ -41,7 +34,6 @@ class RegisterRequest extends FormRequest
         $this->merge([
             'ip' => request()->ip(),
             'role' => User::OWNER,
-            'project_id' => 0
         ]);
     }
 
@@ -50,8 +42,9 @@ class RegisterRequest extends FormRequest
        throw new HttpResponseException(response()->json([
          'success'   => false,
          'message'   => 'Validation errors',
-         'data'      => $validator->errors()
-       ]));
+         'data'      => $validator->errors(),
+         'code' => 400
+       ])->setStatusCode(400));
     }
 
 }

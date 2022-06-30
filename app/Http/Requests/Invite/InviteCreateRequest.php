@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Invite;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
-class LoginRequest extends FormRequest
+class InviteCreateRequest extends FormRequest
 {
-
     public function authorize()
     {
         return true;
@@ -17,9 +16,11 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
+            'project_id' => ['required', 'numeric', 'exists:projects,id'],
+            'inviter_id' => ['required', 'numeric'],
+            'invitee_id' => ['required', 'numeric'],
+            'type' => ['required', 'string', 'min:1', 'max:64'],
             'email' => ['required', 'email', 'exists:users,email'],
-            'password' => ['required', 'string'],
-            'remember_me' => ['nullable', 'boolean'],
         ];
     }
 
@@ -38,5 +39,4 @@ class LoginRequest extends FormRequest
          'data'      => $validator->errors()
        ])->setStatusCode(400));
     }
-
 }

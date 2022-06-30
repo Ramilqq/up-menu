@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('menus', function (Blueprint $table) {
+            $table->id();
+
+            $table->unsignedInteger('project_id')->nullable()->default(NULL);
+            $table->uuid('uuid')->unique();
+            $table->string('name')->nullable()->default(NULL);
+            $table->smallInteger('active')->nullable()->default(NULL);
+            
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('menus');
+    }
+};

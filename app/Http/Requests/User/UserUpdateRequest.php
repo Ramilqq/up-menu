@@ -42,6 +42,6 @@ class UserUpdateRequest extends FormRequest
          'success'   => false,
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
-       ]));
+       ])->setStatusCode(400));
     }
 }

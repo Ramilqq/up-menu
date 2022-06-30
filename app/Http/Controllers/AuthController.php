@@ -11,10 +11,8 @@ use Laravel\Passport\Client;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 
-
 class AuthController extends Controller
 {
-    public $oauth_client_name = 'Laravel Password Grant Client';
 
     function __construct()
     {
@@ -23,7 +21,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $client = Client::query()->where('name', $this->oauth_client_name)->first();
+        $client = Client::query()->where('password_client', 1)->first();
 
         $response = Http::asForm()->post( url('/').'/oauth/token', [
             'grant_type' => 'password',
@@ -33,17 +31,13 @@ class AuthController extends Controller
             'password' => $request->password,
             'scope' => '',
         ]);
-         
-        return $response->json();
-    }
 
-    public function user(Request $request)
-    {
         return response()->json([
-            'success' => 'true',
-            'test' => $request->bearerToken(),
-            'data' => $request->user(),
-        ]);
+            'success' => true,
+            'access_token' => $response['access_token'],
+            'expires_in' => $response['expires_in'],
+            'token_type' => $response['token_type'],
+        ])->withCookie('refresh_token', $response['refresh_token'], 43200);
     }
 
     public function logout(Request $request)
@@ -51,7 +45,7 @@ class AuthController extends Controller
         $request->user()->token()->revoke();
 
         return response()->json([
-            'success' => 'true',
+            'success' => true,
             'message' => __('logout'),
         ]);
     }
@@ -64,7 +58,7 @@ class AuthController extends Controller
         if (!$user = User::create($data))
         {
             return response()->json([
-                    'success' => 'false'
+                    'success' => false
                 ], 200);
         }
         event(new \Illuminate\Auth\Events\Registered($user));
@@ -73,17 +67,22 @@ class AuthController extends Controller
 
     public function token(Request $request)
     {
-        $client = Client::query()->where('name', $this->oauth_client_name)->first();
+        $client = Client::query()->where('password_client', 1)->first();
 
         $response = Http::asForm()->post( url('/').'/oauth/token', [
             'grant_type' => 'refresh_token',
-            'refresh_token' => $request->bearerToken(),
+            'refresh_token' => $request->cookie('refresh_token'),
             'client_id' => $client->id,
             'client_secret' => $client->secret,
             'scope' => '',
         ]);
-         
-        return $response->json();
+        
+        return response()->json([
+            'success' => true,
+            'access_token' => $response['access_token'],
+            'expires_in' => $response['expires_in'],
+            'token_type' => $response['token_type'],
+        ])->withCookie('refresh_token', $response['refresh_token'], 43200);
     }
 
     public function restore(Request $request)
@@ -95,8 +94,8 @@ class AuthController extends Controller
         );
 
         return $status === Password::RESET_LINK_SENT
-            ? response()->json(['success' => 'true', 'message' => __($status)])
-            : response()->json(['success' => 'false', 'message' => __($status)]);
+            ? response()->json(['success' => true, 'message' => __($status)])
+            : response()->json(['success' => false, 'message' => __($status)]);
     }
 
     public function restoreAccount(Request $request)
@@ -120,8 +119,8 @@ class AuthController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-                    ? response()->json(['success' => 'true', 'message' => __($status)])
-                    : response()->json(['success' => 'false', 'message' => __($status)]);
+                    ? response()->json(['success' => true, 'message' => __($status)])
+                    : response()->json(['success' => false, 'message' => __($status)]);
     }
 
 }

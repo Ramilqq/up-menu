@@ -26,7 +26,6 @@ class UserCreateRequest extends FormRequest
             'ip' => ['required', 'string'],
             'role' => ['required', 'string', 'in:'.User::ADMIN.','.User::USER],
             'avatar' => ['image'],
-            'project_id' => ['required', 'numeric']
         ];
     }
 
@@ -44,6 +43,6 @@ class UserCreateRequest extends FormRequest
          'success'   => false,
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
-       ]));
+       ])->setStatusCode(400));
     }
 }

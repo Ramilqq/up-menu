@@ -17,7 +17,7 @@ class AdminProtection
      */
     public function handle(Request $request, Closure $next)
     {
-        if($request->user()->role != User::OWNER and $request->user()->role != User::ADMIN)
+        if($request->user()->role !== User::OWNER and $request->user()->role != User::ADMIN)
         {
             return response()->json([
                 'message' => 'Недостаточно прав.'

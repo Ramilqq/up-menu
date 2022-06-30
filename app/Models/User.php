@@ -31,7 +31,6 @@ class User extends Authenticatable /*implements  MustVerifyEmail*/
         'last_name',
         'email',
         'password',
-        'project_id',
         'phone',
         'avatar',
         'role',

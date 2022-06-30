@@ -11,32 +11,9 @@ use Illuminate\Support\Facades\Storage;
 class EmployeeController extends Controller
 {
 
-    public function index()
-    {
-        $users = User::query()->where('id', '>', '0')->get()->toArray();      
-        return response()->json($users);
-    }
-
-    public function create(UserCreateRequest $request)
-    {
-        $data = $request->validated();
-        $data_mail = $request->only('email', 'password');
-
-        $data['password'] = bcrypt($data['password']);
-
-        if (!$user = User::create($data))
-        {
-            return response()->json([
-                    'success' => 'false'
-                ], 200);
-        }
-        event(new \App\Events\EmployeeCreatedEvent($user, $data_mail));
-        return response()->json($user, 200);
-    }
-
     public function show($id)
     {
-        $user = User::find($id) ?: ['message' => 'Сотрудник не найден'];
+        $user = User::find($id) ?: ['success' => false, 'message' => 'Сотрудник не найден'];
         return $user;
     }
 
@@ -46,6 +23,7 @@ class EmployeeController extends Controller
         if (!$user)
         {
             return response()->json([
+                'success' => false,
                 'message' => 'Пользователь не найден.'
             ]);
         }
@@ -63,6 +41,7 @@ class EmployeeController extends Controller
         $user->fill($data);
         $user->save();
         return response()->json([
+            'success' => true,
             'message' => 'Пользователь обнавлен.'
         ]);
     }
@@ -73,6 +52,7 @@ class EmployeeController extends Controller
         if (!$user)
         {
             return response()->json([
+                'success' => false,
                 'message' => 'Пользователь не найден.'
             ]);
         }
@@ -90,6 +70,7 @@ class EmployeeController extends Controller
         $user->fill($data);
         $user->save();
         return response()->json([
+            'success' => true,
             'message' => 'Пользователь обнавлен.'
         ]);
     }
