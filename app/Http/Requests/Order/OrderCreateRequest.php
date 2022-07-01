@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class OrderCreateRequest extends FormRequest
 {
@@ -17,7 +18,11 @@ class OrderCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'project_id' => ['required', 'numeric', 'exists:projects,id'],
+            'project_id' => ['required', 'numeric',
+                Rule::exists('project_users')->where(function ($query) {
+                    return $query->where('project_id', $this->project_id)->where('user_id', request()->user()->id);
+                }),
+            ],
             'table_id' => ['required', 'numeric', 'exists:tables,id'],
             'user_id' => ['required', 'numeric', 'exists:users,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
@@ -29,7 +34,8 @@ class OrderCreateRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            //
+            'project_id' => $this->id,
+            'user_id' => request()->user()->id,
         ]);
     }
 

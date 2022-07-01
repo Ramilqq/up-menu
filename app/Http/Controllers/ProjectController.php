@@ -8,23 +8,28 @@ use App\Http\Requests\Order\OrderCreateRequest;
 use App\Http\Requests\Project\ProjectCreateRequest;
 use App\Http\Requests\Project\ProjectUpdateRequest;
 use App\Http\Requests\Table\TableCreateRequest;
+use App\Models\Invite;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Project;
+use App\Models\ProjectUser;
 use App\Models\Table;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
     public function show($id)
     {
-        $project = Project::find($id) ?: ['success' => false, 'message' => 'Заведение не найдено.'];
+        $project = Project::projet($id) ?: [];
         return response()->json($project);
     }
 
     public function destroy($id)
     {
-        return Project::destroy($id);
+        Project::deleteImage($id);
+        $resault = Project::projetDestroy($id);
+        return response()->json(['success' => (bool) $resault]);
     }
 
     public function update(ProjectUpdateRequest $request, $id)
@@ -86,16 +91,7 @@ class ProjectController extends Controller
     public function create(ProjectCreateRequest $request)
     {
         $data = $request->validated();
-        
         $project = Project::create($data) ?: ['success' => false];
-
-        if ($request->has('logo')) {
-            $images = $request->file('logo')->storeAs('public/images/project/'.$project->id, 'logo.jpg');
-            $data['logo'] = str_replace('public', 'storage', $images);
-        }else{
-            unset($data['logo']);
-        }
-
         return response()->json($project);
     }
 
@@ -104,9 +100,11 @@ class ProjectController extends Controller
         return  Project::projets(request()->user()->id);
     }
 
-    public function getMenu()
+    public function getMenu($id)
     {
-        return  Project::getMenu(request()->user()->id);
+        $inProject = Project::userAndProject($id);
+        if (!$inProject) return [];
+        return  Project::getMenu($id);
     }
 
     public function createMenu(MenuCreateRequest $request, $id)
@@ -116,17 +114,18 @@ class ProjectController extends Controller
         return response()->json($menu);
     }
 
-    /*public function getUser(Request $request, $id)
+    public function getUser(Request $request, $id)
     {
-        $filter['role'] = $request->role;
-
-        $data = $request->validated();
-        $menu = Menu::create($data) ?: [];
-        return response()->json($menu);
-    }*/
+        $inProject = Project::userAndProject($id);
+        if (!$inProject) return [];
+        $filter = $request->role ?: null;
+        return Project::getUsers($id, $filter);
+    }
 
     public function getOrder($id)
     {
+        $inProject = Project::userAndProject($id);
+        if (!$inProject) return [];
         return  Project::getOrder($id);
     }
 
@@ -139,34 +138,30 @@ class ProjectController extends Controller
 
     public function getTable(Request $request, $id)
     {
-        $filter['active'] = $request->active;
+        $inProject = Project::userAndProject($id);
+        if (!$inProject) return [];
+        isset($request->active) ? $filter = $request->active : $filter = null;
         return  Project::getTables($id, $filter);
     }
 
     public function createTable(TableCreateRequest $request, $id)
     {
         $data = $request->validated();
-        if($data['project_id'] != $id)
-        {
-            return response()->json([], 404);
-        }
         $table = Table::create($data) ?: [];
         return response()->json($table);
     }
 
     public function getInvite($id)
     {
-        return  Project::getOrder($id);
+        $inProject = Project::userAndProject($id);
+        if (!$inProject) return [];
+        return  Project::getInvite($id);
     }
 
     public function createInvite(InviteCreateRequest $request, $id)
     {
         $data = $request->validated();
-        if($data['project_id'] != $id)
-        {
-            return response()->json([], 404);
-        }
-        $invite = Table::create($data) ?: [];
+        $invite = Invite::create($data) ?: [];
         return response()->json($invite);
     }
 

@@ -10,10 +10,10 @@ class Menu extends Model
     use HasFactory;
 
     protected $fillable = [
-        'uuid',
         'project_id',
         'name',
         'active',
+        'order'
     ];
 
     static function dishe($id)

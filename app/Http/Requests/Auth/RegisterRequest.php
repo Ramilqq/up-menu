@@ -22,7 +22,7 @@ class RegisterRequest extends FormRequest
             'first_name' => ['required', 'string', 'min:3', 'max:10'],
             'last_name' => ['required', 'string', 'min:3', 'max:10'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'phone' => ['required', 'unique:users,phone', 'regex:/^(\+)([0-9]*)$/', 'max:16'],
+            'phone' => ['required', 'unique:users,phone', 'regex:/^7([0-9]*)$/', 'max:16'],
             'password' => ['required', 'string', 'confirmed'],
             'ip' => ['required', 'string'],
             'role' => ['required', 'string']

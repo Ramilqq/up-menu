@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Project extends Model
 {
@@ -19,11 +20,31 @@ class Project extends Model
 
 
 
+    static function userAndProject($id)
+    {
+        return ProjectUser::query()->where('project_id', $id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
 
+    static function projet($id)
+    {
+        $project = Project::query()
+            ->where('id', $id)
+            ->where('user_id', request()->user()->id)
+            ->get()->first();
+        return $project;
+    }
 
     static function projets($id)
     {
         return Project::query()->where('user_id', $id)->get()->toArray() ?: [];
+    }
+
+    static function projetDestroy($id)
+    {
+        return Project::query()
+        ->where('id', $id)
+        ->where('user_id', request()->user()->id)
+        ->delete();
     }
 
     static function getMenu($id)
@@ -31,11 +52,22 @@ class Project extends Model
         return Menu::query()->where('project_id', $id)->get()->toArray() ?: [];
     }
 
-    /*static function getUser($id, $filter)
+    static function getUsers($id, $filter)
     {
-        $users = User::query()->where('id', $id)->get()->toArray() ?: [];
-        return Menu::query()->where('project_id', $id)->get()->toArray() ?: [];
-    }*/
+        $users = ProjectUser::query()
+        ->where('project_users.project_id', $id)
+        ->whereNot('users.role', User::OWNER)
+        ->rightJoin('users', 'project_users.user_id', '=', 'users.id')
+        ->select('project_users.project_id', 'users.first_name', 'users.last_name', 'users.email', 'users.role');
+        
+        if ($filter){
+            $filter === User::ADMIN ? $role = User::ADMIN : $role = User::USER;
+            $users->where('users.role', $role);
+        }
+
+        $users = $users->get()->toArray() ?: [];
+        return response()->json($users);
+    }
 
     static function getOrder($id)
     {
@@ -45,9 +77,9 @@ class Project extends Model
     static function getTables($id, $filter)
     {
         $tables = Table::query()->where('project_id', $id);
-        if (isset($filter['active']))
+        if ($filter !== null)
         {
-            $tables->where('active', $filter['active']);
+            $tables->where('active', (bool) $filter);
         }
         return $tables->get()->toArray() ?: [];
     }
@@ -55,5 +87,14 @@ class Project extends Model
     static function getInvite($id)
     {
         return Invite::query()->where('project_id', $id)->get()->toArray() ?: [];
+    }
+
+    static function deleteImage($id)
+    {
+        if (!$project = Project::query()->where('id', $id)->first()) return;
+        $path = $project->logo ?: 'no_file';
+        $path_image = str_replace('storage', 'public', $path);
+        $path_file = str_replace('/logo.jpg', '', $path_image);
+        Storage::deleteDirectory($path_file);
     }
 }

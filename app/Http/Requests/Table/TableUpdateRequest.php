@@ -18,8 +18,8 @@ class TableUpdateRequest extends FormRequest
         return [
             'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
-            'order' => ['numeric'],
             'active' => ['numeric'],
+            'order' => ['required', 'numeric'],
         ];
     }
 

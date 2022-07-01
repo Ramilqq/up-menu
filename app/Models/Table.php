@@ -10,6 +10,7 @@ class Table extends Model
     use HasFactory;
 
     protected $fillable = [
+        'uuid',
         'project_id',
         'name',
         'order',

@@ -19,8 +19,7 @@ class ProjectCreateRequest extends FormRequest
             'user_id' => ['required', 'numeric', 'exists:users,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'alias' => ['required', 'unique:projects,alias'],
-            'logo' => ['required', 'image'],
-            'active' => ['required', 'numeric'],
+            'active' => ['required', 'boolean'],
         ];
     }
 
@@ -28,7 +27,7 @@ class ProjectCreateRequest extends FormRequest
     {
         $this->merge([
             'user_id' => request()->user()->id,
-            'active' => true
+            'active' => true,
         ]);
     }
 

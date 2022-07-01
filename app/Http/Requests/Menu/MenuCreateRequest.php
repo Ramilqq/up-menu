@@ -5,7 +5,7 @@ namespace App\Http\Requests\Menu;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class MenuCreateRequest extends FormRequest
 {
@@ -17,17 +17,23 @@ class MenuCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'uuid' => ['required', 'unique:menus,uuid'],
-            'project_id' => ['required', 'numeric', 'exists:projects,id'],
+            'order' => ['required', 'numeric'],
+            'project_id' => [
+                'required', 'numeric',
+                Rule::exists('project_users')->where(function ($query) {
+                    return $query->where('project_id', $this->project_id)->where('user_id', request()->user()->id);
+                }),
+            ],
             'name' => ['required', 'string', 'min:1', 'max:32'],
-            'active' => ['numeric'],
+            'active' => ['required', 'boolean'],
         ];
     }
 
     protected function prepareForValidation()
     {
         $this->merge([
-            'uuid' => Str::uuid()->toString(),
+            'project_id' => $this->id,
+            'active' => true,
         ]);
     }
 

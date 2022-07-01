@@ -31,7 +31,7 @@ class AuthController extends Controller
             'password' => $request->password,
             'scope' => '',
         ]);
-
+        if ($response->status() !== 200)  return response()->json(['success' => false, 'message' => __('auth.failed')], 400);
         return response()->json([
             'success' => true,
             'access_token' => $response['access_token'],
@@ -57,9 +57,7 @@ class AuthController extends Controller
 
         if (!$user = User::create($data))
         {
-            return response()->json([
-                    'success' => false
-                ], 200);
+            return response()->json(['success' => false], 400);
         }
         event(new \Illuminate\Auth\Events\Registered($user));
         return response()->json($user, 200);
@@ -76,13 +74,13 @@ class AuthController extends Controller
             'client_secret' => $client->secret,
             'scope' => '',
         ]);
-        
+        if ($response->status() !== 200)  return response()->json(['success' => false, 'message' => __('auth.failed')], 400);
         return response()->json([
             'success' => true,
             'access_token' => $response['access_token'],
             'expires_in' => $response['expires_in'],
             'token_type' => $response['token_type'],
-        ])->withCookie('refresh_token', $response['refresh_token'], 43200);
+        ])->withCookie('refresh_token', $response['refresh_token'], 86400);
     }
 
     public function restore(Request $request)

@@ -18,9 +18,10 @@ return new class extends Migration
 
             $table->unsignedInteger('project_id')->nullable()->default(NULL);
             $table->string('name')->nullable()->default(NULL);
-            $table->tinyInteger('order')->nullable()->default(NULL);
+            $table->uuid('uuid')->unique();
             $table->smallInteger('active')->nullable()->default(NULL);
-
+            $table->tinyInteger('order')->nullable()->default(NULL);
+            
             $table->timestamps();
         });
     }
