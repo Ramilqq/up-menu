@@ -29,7 +29,7 @@ class AuthController extends Controller
             'client_secret' => $client->secret,
             'username' => $request->email,
             'password' => $request->password,
-            'scope' => '',
+            'scope' => $request->role,
         ]);
         if ($response->status() !== 200)  return response()->json(['success' => false, 'message' => __('auth.failed')], 400);
         return response()->json([
@@ -66,7 +66,7 @@ class AuthController extends Controller
     public function token(Request $request)
     {
         $client = Client::query()->where('password_client', 1)->first();
-
+        
         $response = Http::asForm()->post( url('/').'/oauth/token', [
             'grant_type' => 'refresh_token',
             'refresh_token' => $request->cookie('refresh_token'),

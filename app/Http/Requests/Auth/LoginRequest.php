@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
@@ -20,13 +21,14 @@ class LoginRequest extends FormRequest
             'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['required', 'string'],
             'remember_me' => ['nullable', 'boolean'],
+            'role' => ['required'],
         ];
     }
 
     protected function prepareForValidation()
     {
         $this->merge([
-            //
+            'role' => User::query()->where('email', $this->email)->get()->value('role') ?: User::USER,
         ]);
     }
 
