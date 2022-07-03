@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Menu;
 
+use App\Policies\MenuPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -11,19 +12,14 @@ class MenuCreateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return MenuPolicy::requestCreate($this->id);
     }
 
     public function rules()
     {
         return [
-            'order' => ['required', 'numeric'],
-            'project_id' => [
-                'required', 'numeric',
-                Rule::exists('project_users')->where(function ($query) {
-                    return $query->where('project_id', $this->project_id)->where('user_id', request()->user()->id);
-                }),
-            ],
+            'order' => ['required', 'numeric', 'min:-128', 'max:127'],
+            'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'active' => ['required', 'boolean'],
         ];
@@ -44,5 +40,12 @@ class MenuCreateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Category;
 
+use App\Policies\CategoryPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -10,15 +11,15 @@ class CategoryCreateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return CategoryPolicy::requestCreate($this->id);
     }
 
     public function rules()
     {
         return [
             'name' => ['required', 'string', 'min:1', 'max:32'],
-            'order' => ['numeric'],
-            'active' => ['numeric'],
+            'order' => ['required', 'numeric', 'min:-128', 'max:127'],
+            'active' => ['required', 'boolean'],
             'menu_id' => ['required', 'numeric', 'exists:menus,id'],
         ];
     }
@@ -26,7 +27,8 @@ class CategoryCreateRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            //
+            'menu_id' => $this->id,
+            'active' => true,
         ]);
     }
 
@@ -37,5 +39,12 @@ class CategoryCreateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

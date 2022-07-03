@@ -6,31 +6,36 @@ use App\Http\Requests\Category\CategoryCreateRequest;
 use App\Http\Requests\Dishe\DisheCreateRequest;
 use App\Http\Requests\Menu\MenuUpdateRequest;
 use App\Http\Requests\Modifier\ModifierCreateRequest;
+use App\Models\Category;
 use App\Models\Dishe;
 use App\Models\Menu;
-use Illuminate\Http\Request;
+use App\Models\Modifier;
 
-class MenuController extends Controller
+class MenuController extends BaseController
 {
+
     public function show($id)
     {
-        $menu = Menu::find($id) ?: ['success' => false, 'message' => 'меню не найдено.'];
+        $menu = $this->userAndMenu($id) ?: [];
         return response()->json($menu);
     }
 
     public function destroy($id)
     {
-        return Menu::destroy($id);
+        $menu = $this->userAndMenu($id) ?: null;
+        if (!$menu) return [];
+        $resault = $menu->delete();
+        return response()->json(['success' => (bool) $resault]);
     }
 
     public function update(MenuUpdateRequest $request, $id)
     {
-        $menu = Menu::find($id) ?: [];
+        $menu = $this->userAndMenu($id) ?: null;
         if (!$menu)
         {
             return response()->json([
                 'success' => false,
-                'message' => 'меню не найдено.'
+                'message' => 'Меню не найдено.'
             ]);
         }
 
@@ -40,7 +45,7 @@ class MenuController extends Controller
         $menu->save();
         return response()->json([
             'success' => true,
-            'message' => 'меню обнавлено.'
+            'message' => 'Меню обнавлено.'
         ]);
     }
 
@@ -51,7 +56,7 @@ class MenuController extends Controller
         {
             return response()->json([
                 'success' => false,
-                'message' => 'меню не найдено.'
+                'message' => 'Меню не найдено.'
             ]);
         }
 
@@ -61,23 +66,29 @@ class MenuController extends Controller
         $menu->save();
         return response()->json([
             'success' => true,
-            'message' => 'меню обнавлено.'
+            'message' => 'Меню обнавлено.'
         ]);
     }
 
     public function getDishe($id)
     {
-        return Menu::dishe($id);
+        $menu = $this->userAndMenu($id) ?: null;
+        if (!$menu) return [];
+        return Menu::dishe($menu->id);
     }
 
     public function getCategory($id)
     {
-        return Menu::dishe($id);
+        $menu = $this->userAndMenu($id) ?: null;
+        if (!$menu) return [];
+        return Menu::category($id);
     }
 
     public function getModifier($id)
     {
-        return Menu::dishe($id);
+        $menu = $this->userAndMenu($id) ?: null;
+        if (!$menu) return [];
+        return Menu::modifier($id);
     }
 
     public function createDishe(DisheCreateRequest $request, $id)
@@ -90,17 +101,15 @@ class MenuController extends Controller
     public function createCategory(CategoryCreateRequest $request, $id)
     {
         $data = $request->validated();
-        $category = Dishe::create($data) ?: ['success' => false];
+        $category = Category::create($data) ?: ['success' => false];
         return response()->json($category);
     }
 
     public function createModifier(ModifierCreateRequest $request, $id)
     {
         $data = $request->validated();
-        $modifier = Dishe::create($data) ?: ['success' => false];
+        $modifier = Modifier::create($data) ?: ['success' => false];
         return response()->json($modifier);
     }
-    
-
 
 }

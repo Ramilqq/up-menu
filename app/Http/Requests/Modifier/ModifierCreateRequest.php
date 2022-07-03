@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Modifier;
 
+use App\Policies\ModifierPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -10,15 +11,15 @@ class ModifierCreateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return ModifierPolicy::requestCreate($this->id);
     }
 
     public function rules()
     {
         return [
             'name' => ['required', 'string', 'min:1', 'max:32'],
-            'order' => ['numeric'],
-            'active' => ['numeric'],
+            'order' => ['required', 'numeric', 'min:-128', 'max:127'],
+            'active' => ['required', 'boolean'],
             'price' => ['required', 'numeric'],
             'menu_id' => ['required', 'numeric', 'exists:menus,id'],
         ];
@@ -27,7 +28,8 @@ class ModifierCreateRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            //
+            'menu_id' => $this->id,
+            'active' => true,
         ]);
     }
 
@@ -38,5 +40,12 @@ class ModifierCreateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

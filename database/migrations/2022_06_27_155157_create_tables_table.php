@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('tables', function (Blueprint $table) {
             $table->id();
 
+            $table->uuid('uuid')->unique();
             $table->unsignedInteger('project_id')->nullable()->default(NULL);
             $table->string('name')->nullable()->default(NULL);
-            $table->uuid('uuid')->unique();
             $table->smallInteger('active')->nullable()->default(NULL);
             $table->tinyInteger('order')->nullable()->default(NULL);
             

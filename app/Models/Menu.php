@@ -31,4 +31,13 @@ class Menu extends Model
         return Modifier::query()->where('menu_id', $id)->get()->toArray() ?: [];
     }
 
+    static function getMenuProjectId($id)
+    {
+        $menu = Menu::find($id) ?: null;
+        if (!$menu)
+        {
+            return null;
+        }
+        return Project::userAndProject($menu->project_id) ? $menu->project_id : null;
+    }
 }
