@@ -23,7 +23,7 @@ class EmailIsVerified
                 return response()->json([
                     'success' => 'false',
                     'message' => __('auth.verified_email'),
-                ]);
+                ], 401);
         }
 
         return $next($request);

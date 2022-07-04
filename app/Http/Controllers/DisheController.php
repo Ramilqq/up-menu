@@ -32,18 +32,14 @@ class DisheController extends Controller
 
         $data = $request->validated();
         
-        if ($request->has('photo')) {
-            $images = $request->file('photo')->storeAs('public/images/dishe/'.$id, 'photo.jpg');
-            $data['photo'] = str_replace('public', 'storage', $images);
-        }else{
-            unset($data['photo']);
-        }
+        $data = $this->saveImage($data, $request);
+        $this->deleteImage($dishe->photo);
 
         $dishe->fill($data);
         $dishe->save();
         return response()->json([
             'success' => true,
-            'message' => 'Блюдо обнавлено.'
+            'message' => 'Блюдо обновлено.'
         ]);
     }
 
@@ -60,18 +56,14 @@ class DisheController extends Controller
 
         $data = $request->validated();
         
-        if ($request->has('photo')) {
-            $images = $request->file('photo')->storeAs('public/images/dishe/'.$id, 'photo.jpg');
-            $data['photo'] = str_replace('public', 'storage', $images);
-        }else{
-            unset($data['photo']);
-        }
+        $data = $this->saveImage($data, $request);
+        $this->deleteImage($dishe->photo);
 
         $dishe->fill($data);
         $dishe->save();
         return response()->json([
             'success' => true,
-            'message' => 'Блюдо обнавлено.'
+            'message' => 'Блюдо обновлено.'
         ]);
     }
 

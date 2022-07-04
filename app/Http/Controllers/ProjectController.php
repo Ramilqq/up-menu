@@ -17,7 +17,7 @@ use App\Models\Table;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class ProjectController extends Controller
+class ProjectController extends BaseController
 {
     public function show($id)
     {
@@ -42,21 +42,17 @@ class ProjectController extends Controller
                 'message' => 'Заведение не найдено.'
             ]);
         }
-        
+                
         $data = $request->validated();
-        
-        if ($request->has('logo')) {
-            $images = $request->file('logo')->storeAs('public/images/project/'.$id, 'logo.jpg');
-            $data['logo'] = str_replace('public', 'storage', $images);
-        }else{
-            unset($data['logo']);
-        }
+
+        $data = $this->saveImage($data, $request);
+        $this->deleteImage($project->logo);
 
         $project->fill($data);
         $project->save();
         return response()->json([
             'success' => true,
-            'message' => 'Заведение обнавлено.'
+            'message' => 'Заведение обновлено.'
         ]);
     }
 
@@ -73,24 +69,21 @@ class ProjectController extends Controller
 
         $data = $request->validated();
         
-        if ($request->has('logo')) {
-            $images = $request->file('logo')->storeAs('public/images/project/'.$id, 'logo.jpg');
-            $data['logo'] = str_replace('public', 'storage', $images);
-        }else{
-            unset($data['logo']);
-        }
+        $data = $this->saveImage($data, $request);
+        $this->deleteImage($project->logo);
 
         $project->fill($data);
         $project->save();
         return response()->json([
             'success' => true,
-            'message' => 'Заведение обнавлено.'
+            'message' => 'Заведение обновлено.'
         ]);
     }
 
     public function create(ProjectCreateRequest $request)
     {
         $data = $request->validated();
+        $data = $this->saveImage($data, $request);
         $project = Project::create($data) ?: ['success' => false];
         return response()->json($project);
     }

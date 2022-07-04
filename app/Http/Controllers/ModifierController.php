@@ -36,7 +36,7 @@ class ModifierController extends Controller
         $modifier->save();
         return response()->json([
             'success' => true,
-            'message' => 'Модификация обнавлена.'
+            'message' => 'Модификация обновлена.'
         ]);
     }
 
@@ -57,7 +57,7 @@ class ModifierController extends Controller
         $modifier->save();
         return response()->json([
             'success' => true,
-            'message' => 'Модификация обнавлена.'
+            'message' => 'Модификация обновлена.'
         ]);
     }
 

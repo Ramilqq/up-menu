@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('description')->nullable()->default(NULL);
             $table->decimal('price', 12, 2)->nullable()->default(NULL);
             $table->string('photo')->nullable()->default(NULL);
-            $table->tinyInteger('order')->nullable()->default(NULL);
-            $table->smallInteger('active')->nullable()->default(NULL);
+            $table->tinyInteger('active')->nullable()->default(NULL);
+            $table->smallInteger('order')->nullable()->default(NULL);
             $table->decimal('kbju', 12, 2)->nullable()->default(NULL);
             $table->decimal('weight', 12, 2)->nullable()->default(NULL);
             $table->decimal('calories', 12, 2)->nullable()->default(NULL);

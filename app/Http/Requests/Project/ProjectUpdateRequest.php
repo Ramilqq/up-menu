@@ -20,7 +20,7 @@ class ProjectUpdateRequest extends FormRequest
             
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'alias' => ['required', 'unique:projects,alias,'.$this->id],
-            'logo' => ['image'],
+            'logo' => ['image', 'dimensions:max_width=1000,max_height=1000'],
             'active' => ['required', 'boolean'],
         ];
 

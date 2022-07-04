@@ -19,6 +19,7 @@ class ProjectCreateRequest extends FormRequest
             'user_id' => ['required', 'numeric', 'exists:users,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'alias' => ['required', 'unique:projects,alias'],
+            'logo' => ['required', 'image', 'dimensions:max_width=1000,max_height=1000'],
             'active' => ['required', 'boolean'],
         ];
     }

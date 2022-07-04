@@ -123,19 +123,6 @@ Route::middleware(['auth:api', 'verified_custom'])->group(function(){
         Route::get('/projects', 'get')->name('project_get');
     });
 
-
-/*
-Заведения: name, alias, logo, active (alias здесь должен быть уникальным)
-Меню: name, active, order
-Блюда: category_id, name, description, price, photo, active, order
-Категории:  name, active, order
-Модификаторы: menu_id, price, name, active, order
-Столы:  name, order, active
-Пользователи: first_name, last_name, avatar
-Заказы: table_id, user_id, name, status, sum
-Инвайты: для инвайтов не нужны методы PUT/PATCH (пусть удалят и создают новый)
-*/
-
 });
 
 Route::post('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {

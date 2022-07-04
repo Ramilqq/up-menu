@@ -36,7 +36,7 @@ class TableController extends Controller
         $table->save();
         return response()->json([
             'success' => true,
-            'message' => 'Стол обнавлен.'
+            'message' => 'Стол обновлен.'
         ]);
     }
 
@@ -57,7 +57,7 @@ class TableController extends Controller
         $table->save();
         return response()->json([
             'success' => true,
-            'message' => 'Стол обнавлен.'
+            'message' => 'Стол обновлен.'
         ]);
     }
 }

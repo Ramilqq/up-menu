@@ -42,7 +42,7 @@ class EmployeeController extends Controller
         $user->save();
         return response()->json([
             'success' => true,
-            'message' => 'Пользователь обнавлен.'
+            'message' => 'Пользователь обновлен.'
         ]);
     }
 
@@ -71,7 +71,7 @@ class EmployeeController extends Controller
         $user->save();
         return response()->json([
             'success' => true,
-            'message' => 'Пользователь обнавлен.'
+            'message' => 'Пользователь обновлен.'
         ]);
     }
 

@@ -94,7 +94,6 @@ class Project extends Model
         if (!$project = Project::query()->where('id', $id)->first()) return;
         $path = $project->logo ?: 'no_file';
         $path_image = str_replace('storage', 'public', $path);
-        $path_file = str_replace('/logo.jpg', '', $path_image);
-        Storage::deleteDirectory($path_file);
+        Storage::delete($path_image);
     }
 }

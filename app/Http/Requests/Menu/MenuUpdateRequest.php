@@ -21,7 +21,7 @@ class MenuUpdateRequest extends FormRequest
             'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'active' => ['required', 'boolean'],
-            'order' => ['required', 'numeric', 'min:-128', 'max:127'],
+            'order' => ['required', 'numeric', 'min:0', 'max:32767'],
         ];
     }
 

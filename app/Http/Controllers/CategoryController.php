@@ -36,7 +36,7 @@ class CategoryController extends Controller
         $category->save();
         return response()->json([
             'success' => true,
-            'message' => 'Категория обнавлена.'
+            'message' => 'Категория обновлена.'
         ]);
     }
 
@@ -57,7 +57,7 @@ class CategoryController extends Controller
         $category->save();
         return response()->json([
             'success' => true,
-            'message' => 'Категория обнавлена.'
+            'message' => 'Категория обновлена.'
         ]);
     }
 

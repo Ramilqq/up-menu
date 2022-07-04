@@ -37,7 +37,7 @@ class OrderController extends Controller
         $order->save();
         return response()->json([
             'success' => true,
-            'message' => 'Заказ обнавлен.'
+            'message' => 'Заказ обновлен.'
         ]);
     }
 
@@ -58,7 +58,7 @@ class OrderController extends Controller
         $order->save();
         return response()->json([
             'success' => true,
-            'message' => 'Заказ обнавлен.'
+            'message' => 'Заказ обновлен.'
         ]);
     }
 

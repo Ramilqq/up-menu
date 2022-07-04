@@ -45,7 +45,7 @@ class MenuController extends BaseController
         $menu->save();
         return response()->json([
             'success' => true,
-            'message' => 'Меню обнавлено.'
+            'message' => 'Меню обновлено.'
         ]);
     }
 
@@ -66,7 +66,7 @@ class MenuController extends BaseController
         $menu->save();
         return response()->json([
             'success' => true,
-            'message' => 'Меню обнавлено.'
+            'message' => 'Меню обновлено.'
         ]);
     }
 
@@ -94,6 +94,7 @@ class MenuController extends BaseController
     public function createDishe(DisheCreateRequest $request, $id)
     {
         $data = $request->validated();
+        $data = $this->saveImage($data, $request);
         $dishe = Dishe::create($data) ?: ['success' => false];
         return response()->json($dishe);
     }
