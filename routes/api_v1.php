@@ -89,7 +89,7 @@ Route::middleware(['auth:api', 'verified_custom'])->group(function(){
         Route::get('/menu/{id}', 'show')->name('menu_show');
         Route::get('/menu/{id}/dishes', 'getDishe')->name('menu_get_dishe');
         Route::get('/menu/{id}/categories', 'getCategory')->name('menu_get_category');
-        Route::get('/menu/{id}/modifiers', 'getModifier')->name('menu_get_modifier');  
+        Route::get('/menu/{id}/modifiers', 'getModifier')->name('menu_get_modifier');
     });
     Route::controller(\App\Http\Controllers\MenuController::class)->middleware('admin_protect')->prefix('/')->group(function() {
         Route::delete('/menu/{id}', 'destroy')->name('menu_destroy');
@@ -99,7 +99,6 @@ Route::middleware(['auth:api', 'verified_custom'])->group(function(){
         Route::post('/menu/{id}/category', 'createCategory')->name('menu_create_category');
         Route::post('/menu/{id}/modifier', 'createModifier')->name('menu_create_modifier');
     });
-    
 
     Route::controller(\App\Http\Controllers\ProjectController::class)->prefix('/')->group(function() {
         Route::get('/projects/{id}/menu', 'getMenu')->name('project_get_menu');

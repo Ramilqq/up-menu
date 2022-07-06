@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\User\UserCreateRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
+use App\Policies\UserPolicy;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
-class EmployeeController extends Controller
+class EmployeeController extends BaseController
 {
 
     public function show($id)
     {
+        if (!UserPolicy::requestShow($id)) return response()->json([]);
         $user = User::find($id) ?: ['success' => false, 'message' => 'Сотрудник не найден'];
         return $user;
     }
@@ -29,14 +30,15 @@ class EmployeeController extends Controller
         }
 
         $data = $request->validated();
-        $data['password'] = bcrypt($data['password']);
+        if (!$data) return response()->json(['success' => true,'message' => 'Нет данных для обновления.']);
         
-        if ($request->has('avatar')) {
-            $images = $request->file('avatar')->storeAs('public/images/users/'.$id, 'avatar.jpg');
-            $data['avatar'] = str_replace('public', 'storage', $images);
-        }else{
-            unset($data['avatar']);
+        if ($request->has('password'))
+        {
+            $data['password'] = bcrypt($data['password']);
         }
+        
+        $data = $this->saveImage($data, $request);
+        $this->deleteImageUser($user->avatar);
 
         $user->fill($data);
         $user->save();
@@ -59,6 +61,8 @@ class EmployeeController extends Controller
 
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
+        $data = $this->saveImage($data, $request);
+        $this->deleteImageUser($user->avatar);
 
         if ($request->has('avatar')) {
             $images = $request->file('avatar')->storeAs('public/images/users/'.$id, 'avatar.jpg');
@@ -77,6 +81,10 @@ class EmployeeController extends Controller
 
     public function destroy($id)
     {
-        return User::destroy($id);
+        if (!UserPolicy::requestDelete($id)) return response()->json([]);
+        $user = User::find($id) ?: ['success' => false, 'message' => 'Блюдо не найдено.'];
+        $this->deleteImageDishe($user->avatar);
+        $resault = $user->delete();
+        return response()->json(['success' => (bool) $resault]);
     }
 }

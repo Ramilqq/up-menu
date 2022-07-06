@@ -37,7 +37,7 @@ class AuthServiceProvider extends ServiceProvider
             User::OWNER => 'User role',
         ]);
 
-        Passport::tokensExpireIn(now()->addMinute(30));
+        Passport::tokensExpireIn(now()->addMinute(30000));
         Passport::refreshTokensExpireIn(now()->addDays(60));
 
         /*VerifyEmail::toMailUsing(function ($notifiable, $url) {

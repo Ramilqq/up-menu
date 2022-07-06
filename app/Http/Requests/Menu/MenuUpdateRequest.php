@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Menu;
 
-use App\Models\Menu;
 use App\Policies\MenuPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
@@ -17,19 +16,27 @@ class MenuUpdateRequest extends FormRequest
 
     public function rules()
     {
-        return [
-            'project_id' => ['required', 'numeric', 'exists:projects,id'],
-            'name' => ['required', 'string', 'min:1', 'max:32'],
-            'active' => ['required', 'boolean'],
-            'order' => ['required', 'numeric', 'min:0', 'max:32767'],
-        ];
+        switch ($this->getMethod())
+        {
+            case 'PATCH':
+                return [
+                    'name' => ['string', 'min:1', 'max:32'],
+                    'active' => ['boolean'],
+                    'order' => ['numeric', 'min:0', 'max:32767'],
+                ];
+            case 'PUT':
+                return [
+                    'name' => ['required', 'string', 'min:1', 'max:32'],
+                    'active' => ['required', 'boolean'],
+                    'order' => ['required', 'numeric', 'min:0', 'max:32767'],
+                ];
+        }
     }
 
     protected function prepareForValidation()
     {
-        $project_id = Menu::getMenuProjectId($this->id);
         $this->merge([
-            'project_id' => $project_id,
+            //
         ]);
     }
 

@@ -10,19 +10,25 @@ use App\Models\Category;
 use App\Models\Dishe;
 use App\Models\Menu;
 use App\Models\Modifier;
+use App\Policies\CategoryPolicy;
+use App\Policies\DishePolicy;
+use App\Policies\MenuPolicy;
+use App\Policies\ModifierPolicy;
 
 class MenuController extends BaseController
 {
 
     public function show($id)
     {
-        $menu = $this->userAndMenu($id) ?: [];
+        if (!MenuPolicy::requestShow($id)) return response()->json([]);
+        $menu = Menu::find($id) ?: ['success' => false, 'message' => 'Меню не найдено.'];
         return response()->json($menu);
     }
 
     public function destroy($id)
     {
-        $menu = $this->userAndMenu($id) ?: null;
+        if (!MenuPolicy::requestDelete($id)) return response()->json([]);
+        $menu = Menu::find($id) ?: [];
         if (!$menu) return [];
         $resault = $menu->delete();
         return response()->json(['success' => (bool) $resault]);
@@ -30,7 +36,7 @@ class MenuController extends BaseController
 
     public function update(MenuUpdateRequest $request, $id)
     {
-        $menu = $this->userAndMenu($id) ?: null;
+        $menu = Menu::find($id) ?: [];
         if (!$menu)
         {
             return response()->json([
@@ -40,7 +46,7 @@ class MenuController extends BaseController
         }
 
         $data = $request->validated();
-
+        if (!$data) return response()->json(['success' => true,'message' => 'Нет данных для обновления.']);
         $menu->fill($data);
         $menu->save();
         return response()->json([
@@ -72,22 +78,19 @@ class MenuController extends BaseController
 
     public function getDishe($id)
     {
-        $menu = $this->userAndMenu($id) ?: null;
-        if (!$menu) return [];
-        return Menu::dishe($menu->id);
+        if (!DishePolicy::requestGet($id)) return response()->json([]);
+        return Menu::dishe($id);
     }
 
     public function getCategory($id)
     {
-        $menu = $this->userAndMenu($id) ?: null;
-        if (!$menu) return [];
+        if (!CategoryPolicy::requestGet($id)) return response()->json([]);
         return Menu::category($id);
     }
 
     public function getModifier($id)
     {
-        $menu = $this->userAndMenu($id) ?: null;
-        if (!$menu) return [];
+        if (!ModifierPolicy::requestGet($id)) return response()->json([]);
         return Menu::modifier($id);
     }
 

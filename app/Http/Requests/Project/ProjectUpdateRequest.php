@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Project;
 
+use App\Policies\ProjectPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -11,35 +12,34 @@ class ProjectUpdateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return ProjectPolicy::requestUpdate($this->id);
     }
 
     public function rules()
     {
-        $rules = [
-            
-            'name' => ['required', 'string', 'min:1', 'max:32'],
-            'alias' => ['required', 'unique:projects,alias,'.$this->id],
-            'logo' => ['image', 'dimensions:max_width=1000,max_height=1000'],
-            'active' => ['required', 'boolean'],
-        ];
-
         switch ($this->getMethod())
         {
             case 'PATCH':
-                return $rules;
+                return [
+                    'name' => ['string', 'min:1', 'max:32'],
+                    'alias' => ['unique:projects,alias,'.$this->id, 'regex:/^[a-z0-9_]+$/'],
+                    'logo' => ['image', 'dimensions:max_width=1000,max_height=1000'],
+                    'active' => ['boolean'],
+                ];
             case 'PUT':
                 return [
-                    'user_id' => ['required', 'numeric', 'exists:users,id'],
-                ] + $rules;
+                    'name' => ['required', 'string', 'min:1', 'max:32'],
+                    'alias' => ['required', 'unique:projects,alias,'.$this->id, 'regex:/^[a-z0-9_]+$/'],
+                    'logo' => ['required', 'image', 'dimensions:max_width=1000,max_height=1000'],
+                    'active' => ['required', 'boolean'],
+                ];
         }
-
     }
 
     protected function prepareForValidation()
     {
         $this->merge([
-            'user_id' => request()->user()->id
+            //
         ]);
     }
 
@@ -50,5 +50,12 @@ class ProjectUpdateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

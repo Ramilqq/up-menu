@@ -3,6 +3,8 @@
 namespace App\Policies;
 
 use App\Models\Menu;
+use App\Models\Modifier;
+use App\Models\Project;
 use App\Models\ProjectUser;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -21,9 +23,23 @@ class ModifierPolicy
         //
     }
 
+    static function requestShow($modifier_id) {
+        return Modifier::userModifierAndMenu($modifier_id);
+    }
+    
+    static function requestGet($menu_id) {
+        return Modifier::userAndMenu($menu_id);
+    }
+
     static function requestCreate($menu_id) {
-        $menu = Menu::find($menu_id) ?: null;
-        if (!$menu) return false;
-        return ProjectUser::query()->where('project_id', $menu->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        return Modifier::userAndMenu($menu_id);
+    }
+
+    static function requestUpdate($modifier_id) {
+        return Modifier::userModifierAndMenu($modifier_id);
+    }
+
+    static function requestDelete($modifier_id) {
+        return Modifier::userModifierAndMenu($modifier_id);
     }
 }

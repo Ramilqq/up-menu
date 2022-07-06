@@ -4,18 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Table\TableUpdateRequest;
 use App\Models\Table;
+use App\Policies\TablePolicy;
 use Illuminate\Http\Request;
 
 class TableController extends Controller
 {
     public function show($id)
     {
+        if (!TablePolicy::requestShow($id)) return response()->json([]);
         $table = Table::find($id) ?: ['success' => false, 'message' => 'Стол не найден.'];
         return response()->json($table);
     }
 
     public function destroy($id)
     {
+        if (!TablePolicy::requestDelete($id)) return response()->json([]);
         return Table::destroy($id);
     }
 
@@ -31,7 +34,7 @@ class TableController extends Controller
         }
 
         $data = $request->validated();
-
+        if (!$data) return response()->json(['success' => true,'message' => 'Нет данных для обновления.']);
         $table->fill($data);
         $table->save();
         return response()->json([

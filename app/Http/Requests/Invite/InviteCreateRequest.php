@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Invite;
 
 use App\Models\User;
+use App\Policies\InvitePolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -12,17 +13,13 @@ class InviteCreateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return InvitePolicy::requestCreate($this->id);
     }
 
     public function rules()
     {
         return [
-            'project_id' => ['required', 'numeric', 
-                Rule::exists('project_users')->where(function ($query) {
-                    return $query->where('project_id', $this->id)->where('user_id', request()->user()->id);
-                }),
-            ],
+            'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'inviter_id' => ['required', 'numeric', 'exists:users,id'],
             'invitee_id' => ['required', 'numeric', 'exists:users,id'],
             'type' => ['required', 'string', 'min:1', 'max:64', 
@@ -46,5 +43,12 @@ class InviteCreateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

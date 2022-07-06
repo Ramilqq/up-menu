@@ -2,13 +2,13 @@
 
 namespace App\Policies;
 
-use App\Models\Menu;
 use App\Models\Project;
 use App\Models\ProjectUser;
+use App\Models\Table;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class MenuPolicy
+class TablePolicy
 {
     use HandlesAuthorization;
 
@@ -22,23 +22,23 @@ class MenuPolicy
         //
     }
 
-    static function requestShow($menu_id) {
-        return Menu::userMenuAndProject($menu_id);
+    static function requestShow($table_id) {
+        return Table::userTableAndProject($table_id);
     }
-
+    
     static function requestGet($project_id) {
-        return Menu::userAndProject($project_id);
+        return Table::userAndProject($project_id);
     }
 
     static function requestCreate($project_id) {
-        return Menu::userAndProject($project_id);
+        return Table::userAndProject($project_id);
     }
 
-    static function requestUpdate($menu_id) {
-        return Menu::userMenuAndProject($menu_id);
+    static function requestUpdate($table_id) {
+        return Table::userTableAndProject($table_id);
     }
 
-    static function requestDelete($menu_id) {
-        return Menu::userMenuAndProject($menu_id);
+    static function requestDelete($table_id) {
+        return Table::userTableAndProject($table_id);
     }
 }

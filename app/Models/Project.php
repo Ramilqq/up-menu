@@ -20,9 +20,18 @@ class Project extends Model
 
 
 
+    static function userAndRole($id)
+    {
+        return request()->user()->role === User::OWNER;
+    }
+
     static function userAndProject($id)
     {
-        return ProjectUser::query()->where('project_id', $id)->where('user_id', request()->user()->id)->first() ? true : false;
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $id)->where('user_id', request()->user()->id)->first() ? true : false; 
     }
 
     static function projet($id)
@@ -92,8 +101,8 @@ class Project extends Model
     static function deleteImage($id)
     {
         if (!$project = Project::query()->where('id', $id)->first()) return;
-        $path = $project->logo ?: 'no_file';
-        $path_image = str_replace('storage', 'public', $path);
+        if (!$img = $project->logo) return;
+        $path_image = 'public/images/project/' . $img;
         Storage::delete($path_image);
     }
 }

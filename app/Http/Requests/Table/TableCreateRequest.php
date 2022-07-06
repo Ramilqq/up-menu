@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Table;
 
+use App\Policies\TablePolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -12,17 +13,13 @@ class TableCreateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return TablePolicy::requestCreate($this->id);
     }
 
     public function rules()
     {
         return [
-            'project_id' => ['required', 'numeric',
-                Rule::exists('project_users')->where(function ($query) {
-                    return $query->where('project_id', $this->project_id)->where('user_id', request()->user()->id);
-                }),
-            ],
+            'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'uuid' => ['required', 'unique:tables,uuid'],
             'active' => ['required', 'boolean'],
@@ -46,5 +43,12 @@ class TableCreateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

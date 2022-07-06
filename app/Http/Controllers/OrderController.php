@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Order\OrderUpdateRequest;
 use App\Models\Order;
+use App\Models\ProjectUser;
 use App\Models\User;
+use App\Policies\OrderPolicy;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     public function show($id)
     {
+        if (!OrderPolicy::requestShow($id)) return response()->json([]);
         $order = Order::find($id) ?: ['success' => false, 'message' => 'Заказ не найден.'];
         return response()->json($order);
     }
 
     public function destroy($id)
     {
+        if (!OrderPolicy::requestDelete($id)) return response()->json([]);
         return Order::destroy($id);
     }
 
@@ -32,7 +36,7 @@ class OrderController extends Controller
         }
 
         $data = $request->validated();
-
+        if (!$data) return response()->json(['success' => true,'message' => 'Нет данных для обновления.']);
         $order->fill($data);
         $order->save();
         return response()->json([
@@ -64,6 +68,7 @@ class OrderController extends Controller
 
     public function assignee($id)
     {
+        if (!OrderPolicy::requestAssignee($id)) return response()->json([]);
         if (!$order = Order::find($id))
         {
             return response()->json(['success' => false, 'message' => 'Заказ не найден.']);
@@ -75,6 +80,7 @@ class OrderController extends Controller
 
     public function assigneeTo($id, $user_id)
     {
+        if (!OrderPolicy::requestAssignee($id)) return response()->json([]);
         if (!$order = Order::find($id))
         {
             return response()->json(['success' => false, 'message' => 'Заказ не найден.']);
@@ -83,8 +89,12 @@ class OrderController extends Controller
         {
             return response()->json(['success' => false, 'message' => 'Сотрудник не найден.']);
         }
+        if (!$project_user = ProjectUser::query()->where('user_id', $user->id)->where('project_id', $order->project_id)->first() )
+        {
+            return response()->json(['success' => false, 'message' => 'Сотрудник не найден.']);
+        }
         $order->user_id = $user->id;
         $order->save();
-        return response()->json(['success' => true, 'message' => 'Заказ назначен на вас.' . $user->first_name .'.']);
+        return response()->json(['success' => true, 'message' => 'Заказ назначен на ' . $user->first_name .'.']);
     }
 }

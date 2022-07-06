@@ -10,40 +10,58 @@ use Illuminate\Support\Facades\Storage;
 
 class BaseController extends Controller
 {
-    public function userAndProject($id)
-    {
-        return Project::userAndProject($id);
-    }
-
-    public function userAndMenu($id)
-    {
-        $menu = Menu::find($id) ?: null;
-        if (!$menu) return false;
-        if ($this->userAndProject($menu->project_id)) return $menu; else false;
-    }
-
     public function saveImage(array $data, Object $request)
     {
-        $path_name = time() . Str::random(5) . '.JPEG';
+        $img_name = time() . Str::random(5) . '.jpg';
 
         if ($request->has('logo')) {
-            $images = $request->file('logo')->storeAs('public/images/project', $path_name);
-            $data['logo'] = str_replace('public', 'storage', $images);
+            $images = $request->file('logo')->storeAs('public/images/project', $img_name);
+            $data['logo'] = $img_name;
         }elseif ($request->has('photo')) {
-            $images = $request->file('photo')->storeAs('public/images/dishe', $path_name);
-            $data['photo'] = str_replace('public', 'storage', $images);
+            $images = $request->file('photo')->storeAs('public/images/dishe', $img_name);
+            $data['photo'] = $img_name;
+        }elseif ($request->has('avatar')) {
+            $images = $request->file('avatar')->storeAs('public/images/avatar', $img_name);
+            $data['avatar'] = $img_name;
         }else{
             unset($data['logo']);
             unset($data['photo']);
+            unset($data['avatar']);
         }
 
         return $data;
     }
 
-    public function deleteImage(string $path)
+    public function deleteImageProject($img)
     {
-        if (!$path) return;
-        $path_image = str_replace('storage', 'public', $path);
+        if (!$img) return;
+        //$path_image = str_replace('storage', 'public', $path);
+        $path_image = 'public/images/project/' . $img;
         Storage::delete($path_image);
+    }
+
+    public function deleteImageDishe($img)
+    {
+        if (!$img) return;
+        //$path_image = str_replace('storage', 'public', $path);
+        $path_image = 'public/images/dishe/' . $img;
+        Storage::delete($path_image);
+    }
+
+    public function deleteImageUser($img)
+    {
+        if (!$img) return;
+        //$path_image = str_replace('storage', 'public', $path);
+        $path_image = 'public/images/avatar/' . $img;
+        Storage::delete($path_image);
+    }
+
+    public function responceBase($success = true, $msg='', $data=[], $code=200)
+    {
+        return response()->json([
+            'success'   => $success,
+            'message'   => $msg,
+            'data'      => $data
+        ], $code);
     }
 }

@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->unsignedInteger('user_id')->nullable()->default(NULL);
             $table->string('name')->nullable()->default(NULL);
-            $table->string('alias')->unique();
+            $table->string('alias')->nullable()->default(NULL);
             $table->string('logo')->nullable()->default(NULL);
             $table->tinyInteger('active')->nullable()->default(NULL);
 

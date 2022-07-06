@@ -2,15 +2,18 @@
 
 namespace App\Http\Requests\Invite;
 
+use App\Policies\InvitePolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
+use App\Models\User;
 
 class InviteUpdateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return InvitePolicy::requestUpdate($this->id);
     }
 
     public function rules()
@@ -19,7 +22,9 @@ class InviteUpdateRequest extends FormRequest
             'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'inviter_id' => ['required', 'numeric'],
             'invitee_id' => ['required', 'numeric'],
-            'type' => ['required', 'string', 'min:1', 'max:64'],
+            'type' => ['required', 'string', 'min:1', 'max:64', 
+                request()->user()->role === User::OWNER ? Rule::in([User::ADMIN, User::USER]) : Rule::in([User::USER]),
+            ],
             'email' => ['required', 'email', 'exists:users,email'],
         ];
     }
@@ -38,5 +43,12 @@ class InviteUpdateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

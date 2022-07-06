@@ -2,7 +2,9 @@
 
 namespace App\Policies;
 
+use App\Models\Category;
 use App\Models\Menu;
+use App\Models\Project;
 use App\Models\ProjectUser;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -21,9 +23,23 @@ class CategoryPolicy
         //
     }
 
+    static function requestShow($category_id) {
+        return Category::userCategoryAndMenu($category_id);
+    }
+    
+    static function requestGet($menu_id) {
+        return Category::userAndMenu($menu_id);
+    }
+
     static function requestCreate($menu_id) {
-        $menu = Menu::find($menu_id) ?: null;
-        if (!$menu) return false;
-        return ProjectUser::query()->where('project_id', $menu->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        return Category::userAndMenu($menu_id);
+    }
+
+    static function requestUpdate($category_id) {
+        return Category::userCategoryAndMenu($category_id);
+    }
+
+    static function requestDelete($category_id) {
+        return Category::userCategoryAndMenu($category_id);
     }
 }

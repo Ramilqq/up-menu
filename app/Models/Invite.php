@@ -17,4 +17,23 @@ class Invite extends Model
         'email',
     ];
 
+    static function userAndProject($project_id)
+    {
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
+
+    static function userInviteAndProject($invite_id)
+    {
+        $invite = Invite::find($invite_id) ?: null;
+        if (!$invite) return false;
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $invite->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $invite->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
 }

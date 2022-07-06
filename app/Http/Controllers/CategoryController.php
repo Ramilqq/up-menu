@@ -4,18 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Category\CategoryUpdateRequest;
 use App\Models\Category;
+use App\Policies\CategoryPolicy;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
     public function show($id)
     {
+        if (!CategoryPolicy::requestShow($id)) return response()->json([]);
         $category = Category::find($id) ?: ['success' => false, 'message' => 'Категория не найдена.'];
         return response()->json($category);
     }
 
     public function destroy($id)
     {
+        if (!CategoryPolicy::requestDelete($id)) return response()->json([]);
         return Category::destroy($id);
     }
 
@@ -31,7 +34,7 @@ class CategoryController extends Controller
         }
 
         $data = $request->validated();
-
+        if (!$data) return response()->json(['success' => true,'message' => 'Нет данных для обновления.']);
         $category->fill($data);
         $category->save();
         return response()->json([
@@ -63,6 +66,7 @@ class CategoryController extends Controller
 
     public function active($id)
     {
+        if (!CategoryPolicy::requestShow($id)) return response()->json([]);
         $category = Category::find($id) ?: [];
         if (!$category)
         {
@@ -81,6 +85,7 @@ class CategoryController extends Controller
 
     public function inactive($id)
     {
+        if (!CategoryPolicy::requestShow($id)) return response()->json([]);
         $category = Category::find($id) ?: [];
         if (!$category)
         {

@@ -63,4 +63,24 @@ class User extends Authenticatable /*implements  MustVerifyEmail*/
     
         $this->notify(new ResetPasswordNotification($url));
     }
+
+    static function userAndProject($project_id)
+    {
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
+
+    static function userAndUserProject($user_id)
+    {
+        $project_user = ProjectUser::find($user_id) ?: null;
+        if (!$project_user) return false;
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $project_user->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $project_user->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
 }

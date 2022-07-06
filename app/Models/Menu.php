@@ -40,4 +40,24 @@ class Menu extends Model
         }
         return Project::userAndProject($menu->project_id) ? $menu->project_id : null;
     }
+
+    static function userAndProject($project_id)
+    {
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
+
+    static function userMenuAndProject($menu_id)
+    {
+        $menu = Menu::find($menu_id) ?: null;
+        if (!$menu) return false;
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $menu->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $menu->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
 }

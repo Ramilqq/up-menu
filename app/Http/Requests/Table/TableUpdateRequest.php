@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Table;
 
+use App\Models\Table;
+use App\Policies\TablePolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -10,17 +12,26 @@ class TableUpdateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return TablePolicy::requestUpdate($this->id);
     }
 
     public function rules()
     {
-        return [
-            'project_id' => ['required', 'numeric', 'exists:projects,id'],
-            'name' => ['required', 'string', 'min:1', 'max:32'],
-            'active' => ['required', 'boolean'],
-            'order' => ['required', 'numeric', 'min:0', 'max:32767'],
-        ];
+        switch ($this->getMethod())
+        {
+            case 'PATCH':
+                return [
+                    'name' => ['string', 'min:1', 'max:32'],
+                    'active' => ['boolean'],
+                    'order' => ['numeric', 'min:0', 'max:32767'],
+                ];
+            case 'PUT':
+                return [
+                    'name' => ['required', 'string', 'min:1', 'max:32'],
+                    'active' => ['required', 'boolean'],
+                    'order' => ['required', 'numeric', 'min:0', 'max:32767'],
+                ];
+        }
     }
 
     protected function prepareForValidation()
@@ -37,5 +48,12 @@ class TableUpdateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }

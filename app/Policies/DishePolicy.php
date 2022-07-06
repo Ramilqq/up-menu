@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Dishe;
 use App\Models\Menu;
+use App\Models\Project;
 use App\Models\ProjectUser;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -22,15 +23,24 @@ class DishePolicy
         //
     }
 
-    static function requestCreate($menu_id) {
-        $menu = Menu::find($menu_id) ?: null;
-        if (!$menu) return false;
-        return ProjectUser::query()->where('project_id', $menu->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    static function requestShow($dishe_id) {
+        return Dishe::userDisheAndMenu($dishe_id);
+    }
+    
+    static function requestGet($menu_id) {
+        return Dishe::userAndMenu($menu_id);
     }
 
-    static function requestUpdate(User $user)
-    {
-        return true;
+    static function requestCreate($menu_id) {
+        return Dishe::userAndMenu($menu_id);
+    }
+
+    static function requestUpdate($dishe_id) {
+        return Dishe::userDisheAndMenu($dishe_id);
+    }
+
+    static function requestDelete($dishe_id) {
+        return Dishe::userDisheAndMenu($dishe_id);
     }
 
 }

@@ -23,4 +23,23 @@ class Order extends Model
         'sum',
     ];
 
+    static function userAndProject($project_id)
+    {
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
+
+    static function userOrderAndProject($order_id)
+    {
+        $order = Order::find($order_id) ?: null;
+        if (!$order) return false;
+        if (request()->user()->role === User::OWNER)
+        {
+            return Project::query()->where('id', $order->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+        }
+        return ProjectUser::query()->where('project_id', $order->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
 }

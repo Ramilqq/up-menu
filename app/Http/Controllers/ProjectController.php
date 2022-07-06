@@ -12,9 +12,13 @@ use App\Models\Invite;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Project;
-use App\Models\ProjectUser;
 use App\Models\Table;
-use App\Models\User;
+use App\Policies\InvitePolicy;
+use App\Policies\MenuPolicy;
+use App\Policies\OrderPolicy;
+use App\Policies\ProjectPolicy;
+use App\Policies\TablePolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Http\Request;
 
 class ProjectController extends BaseController
@@ -27,8 +31,10 @@ class ProjectController extends BaseController
 
     public function destroy($id)
     {
-        Project::deleteImage($id);
-        $resault = Project::projetDestroy($id);
+        if (!ProjectPolicy::requestDelete($id)) return response()->json(['success' => false]);
+        $project = Project::find($id) ?: ['success' => false, 'message' => 'Проект не найден.'];
+        $this->deleteImageDishe($project->logo);
+        $resault =  $project->delete();
         return response()->json(['success' => (bool) $resault]);
     }
 
@@ -42,11 +48,11 @@ class ProjectController extends BaseController
                 'message' => 'Заведение не найдено.'
             ]);
         }
-                
-        $data = $request->validated();
 
+        $data = $request->validated();
+        if (!$data) return response()->json(['success' => true,'message' => 'Нет данных для обновления.']);
         $data = $this->saveImage($data, $request);
-        $this->deleteImage($project->logo);
+        $this->deleteImageProject($project->logo);
 
         $project->fill($data);
         $project->save();
@@ -70,7 +76,7 @@ class ProjectController extends BaseController
         $data = $request->validated();
         
         $data = $this->saveImage($data, $request);
-        $this->deleteImage($project->logo);
+        $this->deleteImageProject($project->logo);
 
         $project->fill($data);
         $project->save();
@@ -95,8 +101,7 @@ class ProjectController extends BaseController
 
     public function getMenu($id)
     {
-        $inProject = Project::userAndProject($id);
-        if (!$inProject) return [];
+        if (!MenuPolicy::requestGet($id)) return response()->json([]);
         return  Project::getMenu($id);
     }
 
@@ -109,16 +114,14 @@ class ProjectController extends BaseController
 
     public function getUser(Request $request, $id)
     {
-        $inProject = Project::userAndProject($id);
-        if (!$inProject) return [];
+        if (!UserPolicy::requestGet($id)) return response()->json([]);
         $filter = $request->role ?: null;
         return Project::getUsers($id, $filter);
     }
 
     public function getOrder($id)
     {
-        $inProject = Project::userAndProject($id);
-        if (!$inProject) return [];
+        if (!OrderPolicy::requestGet($id)) return response()->json([]);
         return  Project::getOrder($id);
     }
 
@@ -131,8 +134,7 @@ class ProjectController extends BaseController
 
     public function getTable(Request $request, $id)
     {
-        $inProject = Project::userAndProject($id);
-        if (!$inProject) return [];
+        if (!TablePolicy::requestGet($id)) return response()->json([]);
         isset($request->active) ? $filter = $request->active : $filter = null;
         return  Project::getTables($id, $filter);
     }
@@ -146,8 +148,7 @@ class ProjectController extends BaseController
 
     public function getInvite($id)
     {
-        $inProject = Project::userAndProject($id);
-        if (!$inProject) return [];
+        if (!InvitePolicy::requestGet($id)) return response()->json([]);
         return  Project::getInvite($id);
     }
 

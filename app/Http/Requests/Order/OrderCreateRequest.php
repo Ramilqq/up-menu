@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Order;
 
 use App\Models\Order;
+use App\Policies\OrderPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -12,19 +13,14 @@ class OrderCreateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        return OrderPolicy::requestCreate($this->id);
     }
 
     public function rules()
     {
         return [
-            'project_id' => ['required', 'numeric',
-                Rule::exists('project_users')->where(function ($query) {
-                    return $query->where('project_id', $this->project_id)->where('user_id', request()->user()->id);
-                }),
-            ],
+            'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'table_id' => ['required', 'numeric', 'exists:tables,id'],
-            'user_id' => ['required', 'numeric', 'exists:users,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'status' => ['required', 'string', 'in:'. Order::NEW.','.Order::WORK.','.Order::CLOSE.','.Order::PAID],
             'sum' => ['required', 'numeric'],
@@ -35,7 +31,6 @@ class OrderCreateRequest extends FormRequest
     {
         $this->merge([
             'project_id' => $this->id,
-            'user_id' => request()->user()->id,
         ]);
     }
 
@@ -46,5 +41,12 @@ class OrderCreateRequest extends FormRequest
          'message'   => 'Validation errors',
          'data'      => $validator->errors()
        ])->setStatusCode(400));
+    }
+
+    public function failedAuthorization() {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Authorization errors',
+          ])->setStatusCode(401));
     }
 }
