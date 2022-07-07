@@ -18,7 +18,7 @@ class CategoryCreateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:1', 'max:32'],
-            'order' => ['required', 'numeric', 'min:0', 'max:32767'],
+            'order' => ['numeric', 'min:0', 'max:32767'],
             'active' => ['required', 'boolean'],
             'menu_id' => ['required', 'numeric', 'exists:menus,id'],
         ];

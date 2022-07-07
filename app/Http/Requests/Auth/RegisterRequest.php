@@ -17,13 +17,12 @@ class RegisterRequest extends FormRequest
 
     public function rules()
     {
-        
         return [
             'first_name' => ['required', 'string', 'min:3', 'max:10'],
             'last_name' => ['required', 'string', 'min:3', 'max:10'],
             'email' => ['required', 'email', 'unique:users,email'],
             'phone' => ['required', 'unique:users,phone', 'regex:/^7([0-9]*)$/', 'max:16'],
-            'password' => ['required', 'string', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed', 'min:3', 'max:30'],
             'ip' => ['required', 'string'],
             'role' => ['required', 'string']
         ];

@@ -8,12 +8,12 @@ Route::middleware('guest')->group(function(){
 
     Route::controller(\App\Http\Controllers\AuthController::class)->prefix('/auth')->group(function() {
         Route::post('/register', 'register')->name('register');
+        Route::post('/register/{uuid}', 'registerInvite')->name('register_invite');
         Route::post('/login', 'login')->name('login');
         Route::post('/token', 'token')->name('token');
         Route::post('/restore', 'restore')->name('restore');
         Route::post('/restore/account', 'restoreAccount')->name('restore_account');
     });
-
 });
 
 Route::middleware(['auth:api', 'verified_custom'])->group(function(){

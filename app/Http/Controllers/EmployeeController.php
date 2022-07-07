@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\UserCreateRequest;
 use App\Http\Requests\User\UserUpdateRequest;
+use App\Models\ProjectUser;
 use App\Models\User;
 use App\Policies\UserPolicy;
 use Illuminate\Http\Request;
@@ -82,7 +83,7 @@ class EmployeeController extends BaseController
     public function destroy($id)
     {
         if (!UserPolicy::requestDelete($id)) return response()->json([]);
-        $user = User::find($id) ?: ['success' => false, 'message' => 'Блюдо не найдено.'];
+        if($user = User::find($id)) return ['success' => false, 'message' => 'Пользователь не найден.'];
         $this->deleteImageDishe($user->avatar);
         $resault = $user->delete();
         return response()->json(['success' => (bool) $resault]);

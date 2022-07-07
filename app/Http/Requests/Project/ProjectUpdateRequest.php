@@ -23,7 +23,7 @@ class ProjectUpdateRequest extends FormRequest
                 return [
                     'name' => ['string', 'min:1', 'max:32'],
                     'alias' => ['unique:projects,alias,'.$this->id, 'regex:/^[a-z0-9_]+$/'],
-                    'logo' => ['image', 'dimensions:max_width=1000,max_height=1000'],
+                    'logo' => ['image', 'dimensions:max_width=91000,max_height=91000'],
                     'active' => ['boolean'],
                 ];
             case 'PUT':

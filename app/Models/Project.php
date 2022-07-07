@@ -45,7 +45,8 @@ class Project extends Model
 
     static function projets($id)
     {
-        return Project::query()->where('user_id', $id)->get()->toArray() ?: [];
+        $limit = request()->limit ?: 10;
+        return Project::query()->where('user_id', $id)->simplePaginate($limit) ?: [];
     }
 
     static function projetDestroy($id)
@@ -58,11 +59,13 @@ class Project extends Model
 
     static function getMenu($id)
     {
-        return Menu::query()->where('project_id', $id)->get()->toArray() ?: [];
+        $limit = request()->limit ?: 10;
+        return Menu::query()->where('project_id', $id)->simplePaginate($limit) ?: [];
     }
 
     static function getUsers($id, $filter)
     {
+        $limit = request()->limit ?: 10;
         $users = ProjectUser::query()
         ->where('project_users.project_id', $id)
         ->whereNot('users.role', User::OWNER)
@@ -74,28 +77,31 @@ class Project extends Model
             $users->where('users.role', $role);
         }
 
-        $users = $users->get()->toArray() ?: [];
+        $users = $users->simplePaginate($limit) ?: [];
         return response()->json($users);
     }
 
     static function getOrder($id)
     {
-        return Order::query()->where('project_id', $id)->get()->toArray() ?: [];
+        $limit = request()->limit ?: 10;
+        return Order::query()->where('project_id', $id)->simplePaginate($limit) ?: [];
     }
     
     static function getTables($id, $filter)
     {
+        $limit = request()->limit ?: 10;
         $tables = Table::query()->where('project_id', $id);
         if ($filter !== null)
         {
             $tables->where('active', (bool) $filter);
         }
-        return $tables->get()->toArray() ?: [];
+        return $tables->simplePaginate($limit) ?: [];
     }
 
     static function getInvite($id)
     {
-        return Invite::query()->where('project_id', $id)->get()->toArray() ?: [];
+        $limit = request()->limit ?: 10;
+        return Invite::query()->where('project_id', $id)->simplePaginate($limit) ?: [];
     }
 
     static function deleteImage($id)

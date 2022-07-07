@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\User\UserCreateRequest;
+use App\Models\ProjectUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -59,6 +61,20 @@ class AuthController extends Controller
         {
             return response()->json(['success' => false], 400);
         }
+        event(new \Illuminate\Auth\Events\Registered($user));
+        return response()->json($user, 200);
+    }
+
+    public function registerInvite(UserCreateRequest $request, $uuid)
+    {
+        $data = $request->validated();
+        $data['password'] = bcrypt($data['password']);
+
+        if (!$user = User::create($data))
+        {
+            return response()->json(['success' => false], 400);
+        }
+        ProjectUser::create(['user_id'=>$user->id, 'project_id'=>$data['project_id']]);
         event(new \Illuminate\Auth\Events\Registered($user));
         return response()->json($user, 200);
     }

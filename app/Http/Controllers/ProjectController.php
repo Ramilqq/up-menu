@@ -20,6 +20,8 @@ use App\Policies\ProjectPolicy;
 use App\Policies\TablePolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use PhpParser\Node\Stmt\TryCatch;
 
 class ProjectController extends BaseController
 {
@@ -156,6 +158,8 @@ class ProjectController extends BaseController
     {
         $data = $request->validated();
         $invite = Invite::create($data) ?: [];
+
+        event(new \App\Events\InviteCreateEvent($invite));
         return response()->json($invite);
     }
 

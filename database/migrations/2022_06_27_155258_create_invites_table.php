@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('invites', function (Blueprint $table) {
             $table->id();
 
+            $table->uuid('uuid')->unique();
             $table->unsignedInteger('project_id')->nullable()->default(NULL);
             $table->unsignedInteger('inviter_id')->nullable()->default(NULL);
             $table->unsignedInteger('invitee_id')->nullable()->default(NULL);

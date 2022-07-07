@@ -23,7 +23,7 @@ class TableCreateRequest extends FormRequest
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'uuid' => ['required', 'unique:tables,uuid'],
             'active' => ['required', 'boolean'],
-            'order' => ['required', 'numeric', 'min:0', 'max:32767'],
+            'order' => ['numeric', 'min:0', 'max:32767'],
         ];
     }
 

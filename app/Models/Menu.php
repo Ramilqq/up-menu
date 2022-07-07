@@ -18,17 +18,20 @@ class Menu extends Model
 
     static function dishe($id)
     {
-        return Dishe::query()->where('menu_id', $id)->get()->toArray() ?: [];
+        $limit = request()->limit ?: 10;
+        return Dishe::query()->where('menu_id', $id)->simplePaginate($limit) ?: [];
     }
 
     static function category($id)
     {
-        return Category::query()->where('menu_id', $id)->get()->toArray() ?: [];
+        $limit = request()->limit ?: 10;
+        return Category::query()->where('menu_id', $id)->simplePaginate($limit) ?: [];
     }
 
     static function modifier($id)
     {
-        return Modifier::query()->where('menu_id', $id)->get()->toArray() ?: [];
+        $limit = request()->limit ?: 10;
+        return Modifier::query()->where('menu_id', $id)->simplePaginate($limit) ?: [];
     }
 
     static function getMenuProjectId($id)

@@ -18,7 +18,7 @@ class MenuCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'order' => ['required', 'numeric', 'min:0', 'max:32767'],
+            'order' => ['numeric', 'min:0', 'max:32767'],
             'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'active' => ['required', 'boolean'],

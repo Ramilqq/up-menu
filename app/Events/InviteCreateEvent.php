@@ -10,17 +10,14 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class EmployeeCreatedEvent
+class InviteCreateEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user;
-    public $data;
-    
-    public function __construct($user, $data)
-    {
-        $this->user = $user;
-        $this->data = $data;
-    }
+    public $invite;
 
+    public function __construct($invite)
+    {
+        $this->invite = $invite;
+    }
 }

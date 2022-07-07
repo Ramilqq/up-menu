@@ -18,10 +18,12 @@ class EventServiceProvider extends ServiceProvider
             //\Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,
             'App\Listeners\SendEmailVerificationListener',
         ],
+        'App\Events\InviteCreateEvent' => [
+            'App\Listeners\SendEmailInviteListener',
+        ],
         'App\Events\EmployeeCreatedEvent' => [
             'App\Listeners\SendEmailEmployeeLoginListener',
         ],
-
         'Laravel\Passport\Events\AccessTokenCreated' => [
             'App\Listeners\RevokeOldTokens',
         ],

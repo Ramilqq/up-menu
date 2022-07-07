@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class InviteCreateRequest extends FormRequest
 {
@@ -19,13 +20,14 @@ class InviteCreateRequest extends FormRequest
     public function rules()
     {
         return [
+            'uuid' => ['required', 'unique:invites,uuid'],
             'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'inviter_id' => ['required', 'numeric', 'exists:users,id'],
             'invitee_id' => ['required', 'numeric', 'exists:users,id'],
             'type' => ['required', 'string', 'min:1', 'max:64', 
                 request()->user()->role === User::OWNER ? Rule::in([User::ADMIN, User::USER]) : Rule::in([User::USER]),
             ],
-            'email' => ['required', 'email', 'exists:users,email'],
+            'email' => ['email'],
         ];
     }
 
@@ -33,6 +35,7 @@ class InviteCreateRequest extends FormRequest
     {
         $this->merge([
             'project_id' => $this->id,
+            'uuid' => Str::uuid()->toString(),
         ]);
     }
 
