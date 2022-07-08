@@ -32,9 +32,9 @@ class BaseController extends Controller
             unset($data['avatar']);
         }
 
-        if ($exif = @exif_read_data($request->file('logo')))
+        if ($exif = @exif_read_data($path_save))
         {
-            $image = imagecreatefromstring(file_get_contents($request->file('logo')));
+            $image = imagecreatefromstring(file_get_contents($path_save));
             if(!empty($exif['Orientation']))
             {
                 switch($exif['Orientation']) {
