@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('project_users', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedInteger('project_id')->nullable()->default(NULL);
-            $table->unsignedInteger('user_id')->nullable()->default(NULL);
+            $table->foreignId('project_id')->constrained('projects')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
         });

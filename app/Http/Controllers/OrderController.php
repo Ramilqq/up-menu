@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Order\OrderUpdateRequest;
+use App\Http\Requests\OrderDishe\OrderDisheRequest;
+use App\Models\Dishe;
 use App\Models\Order;
+use App\Models\OrderDishe;
 use App\Models\ProjectUser;
 use App\Models\User;
 use App\Policies\OrderPolicy;
@@ -21,7 +24,8 @@ class OrderController extends Controller
     public function destroy($id)
     {
         if (!OrderPolicy::requestDelete($id)) return response()->json([]);
-        return Order::destroy($id);
+        $resault = Order::destroy($id);
+        return response()->json(['success' => (bool) $resault]);
     }
 
     public function update(OrderUpdateRequest $request, $id)
@@ -97,4 +101,34 @@ class OrderController extends Controller
         $order->save();
         return response()->json(['success' => true, 'message' => 'Заказ назначен на ' . $user->first_name .'.']);
     }
+
+    public function getDisheOrder($id)
+    {
+        if (!OrderPolicy::requestGet($id)) return response()->json([]);
+        $dishes = Order::getOrderDishes($id);
+        return response()->json($dishes);
+    }
+
+    public function destroyDisheOrder(OrderDisheRequest $request, $id)
+    {
+        if (!OrderPolicy::requestGet($id)) return response()->json([]);
+        $data = $request->validated();
+        foreach ($data['dishes_id'] as $dish)
+        {
+            $dishes[] = (bool) OrderDishe::query()->where('dishe_id', $dish)->where('order_id', $id)->delete();
+        }
+        return response()->json(['success' => true, 'message' => 'Заказ обнавлен', 'data' => $dishes]);
+    }
+
+    public function updateDisheOrder(OrderDisheRequest $request, $id)
+    {
+        if (!OrderPolicy::requestUpdate($id)) return response()->json([]);
+        $data = $request->validated();
+        foreach ($data['dishes_id'] as $dish)
+        {
+            $dishes[] = OrderDishe::create(['order_id'=> $id, 'dishe_id'=> $dish]);
+        }
+        return response()->json(['success' => true, 'message' => 'Заказ обнавлен', 'data' => $dishes]);
+    }
+
 }

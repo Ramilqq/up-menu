@@ -9,18 +9,16 @@ class Order extends Model
 {
     use HasFactory;
 
-    const NEW = 'новый';
-    const WORK = 'в работе';
-    const CLOSE = 'закрыт';
-    const PAID = 'оплачен';
+    const NEW = 'new';
+    const WORK = 'work';
+    const CLOSE = 'close';
+    const PAID = 'paid';
 
     protected $fillable = [
         'project_id',
         'table_id',
         'user_id',
-        'name',
         'status',
-        'sum',
     ];
 
     static function userAndProject($project_id)
@@ -41,5 +39,11 @@ class Order extends Model
             return Project::query()->where('id', $order->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
         }
         return ProjectUser::query()->where('project_id', $order->project_id)->where('user_id', request()->user()->id)->first() ? true : false;
+    }
+
+    static function getOrderDishes($order_id)
+    {
+        if (!$dishes = OrderDishe::query()->where('order_id', $order_id)->select('dishe_id')->get()->toArray()) return [];
+        return Dishe::query()->whereIn('id', $dishes)->get()->toArray() ?: [];
     }
 }

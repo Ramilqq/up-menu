@@ -13,14 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('menus', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedInteger('user_id')->nullable()->default(NULL);
+            $table->foreignId('project_id')->constrained('projects')->onUpdate('cascade')->onDelete('cascade');
             $table->string('name')->nullable()->default(NULL);
-            $table->string('alias')->nullable()->default(NULL);
-            $table->string('logo')->nullable()->default(NULL);
             $table->tinyInteger('active')->nullable()->default(NULL);
+            $table->smallInteger('order')->nullable()->default(NULL);
 
             $table->timestamps();
         });
@@ -33,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('menus');
     }
 };

@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Order;
+namespace App\Http\Requests\OrderDishe;
 
-use App\Models\Order;
 use App\Policies\OrderPolicy;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
-class OrderUpdateRequest extends FormRequest
+class OrderDisheRequest extends FormRequest
 {
     public function authorize()
     {
@@ -21,23 +20,21 @@ class OrderUpdateRequest extends FormRequest
         {
             case 'PATCH':
                 return [
-                    'table_id' => ['numeric', 'exists:tables,id'],
-                    'user_id' => ['numeric', 'exists:users,id'],
-                    'status' => ['string', 'in:'. Order::NEW.','.Order::WORK.','.Order::CLOSE.','.Order::PAID],
+                    'order_id' => ['required', 'numeric', 'exists:orders,id'],
+                    'dishes_id' => ['required', 'array', 'exists:dishes,id'],
                 ];
-            case 'PUT':
+            case 'DELETE':
                 return [
-                    'table_id' => ['required', 'numeric', 'exists:tables,id'],
-                    'user_id' => ['required', 'numeric', 'exists:users,id'],
-                    'status' => ['required', 'string', 'in:'. Order::NEW.','.Order::WORK.','.Order::CLOSE.','.Order::PAID],
+                    'order_id' => ['required', 'numeric', 'exists:orders,id'],
+                    'dishes_id' => ['required', 'array', 'exists:dishes,id'],
                 ];
         }
     }
 
     protected function prepareForValidation()
-    {
+    {    
         $this->merge([
-            //
+            'order_id' => $this->id,
         ]);
     }
 

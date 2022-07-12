@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('dishes', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedInteger('menu_id')->nullable()->default(NULL);
-            $table->unsignedInteger('category_id')->nullable()->default(NULL);
+            $table->foreignId('menu_id')->constrained('menus')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onUpdate('cascade')->onDelete('cascade');
             $table->string('name')->nullable()->default(NULL);
             $table->string('description')->nullable()->default(NULL);
             $table->decimal('price', 12, 2)->nullable()->default(NULL);

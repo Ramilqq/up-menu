@@ -11,6 +11,7 @@ use App\Http\Requests\Table\TableCreateRequest;
 use App\Models\Invite;
 use App\Models\Menu;
 use App\Models\Order;
+use App\Models\OrderDishe;
 use App\Models\Project;
 use App\Models\Table;
 use App\Policies\InvitePolicy;
@@ -131,13 +132,18 @@ class ProjectController extends BaseController
     {
         $data = $request->validated();
         $order = Order::create($data) ?: [];
+        foreach ($data['dishes_id'] as $dish)
+        {
+            OrderDishe::create(['order_id'=> $order->id, 'dishe_id'=> $dish]);
+        }
+        
         return response()->json($order);
     }
 
     public function getTable(Request $request, $id)
     {
         if (!TablePolicy::requestGet($id)) return response()->json([]);
-        isset($request->active) ? $filter = $request->active : $filter = null;
+        $filter = $request->all();
         return  Project::getTables($id, $filter);
     }
 

@@ -10,29 +10,35 @@ use Illuminate\Support\Facades\Storage;
 
 class BaseController extends Controller
 {
+    public $project_path =  'public/images/project/';
+    public $dishe_path =  'public/images/dishe/';
+    public $user_path =  'public/images/avatar/';
+
     public function saveImage(array $data, Object $request)
     {
         $img_name = time() . Str::random(5) . '.jpg';
         
         if ($request->has('logo')) {
-            $images = $request->file('logo')->storeAs('public/images/project', $img_name);
+            $images = $request->file('logo')->storeAs($this->project_path, $img_name);
             $data['logo'] = $img_name;
-            $path_save = Storage::path ('public/images/project/'.$img_name);
+            $path_save = Storage::path ($this->project_path.$img_name);
         }elseif ($request->has('photo')) {
-            $images = $request->file('photo')->storeAs('public/images/dishe', $img_name);
+            $images = $request->file('photo')->storeAs($this->dishe_path, $img_name);
             $data['photo'] = $img_name;
-            $path_save = Storage::path ('public/images/dishe/'.$img_name);
+            $path_save = Storage::path ($this->dishe_path.$img_name);
         }elseif ($request->has('avatar')) {
-            $images = $request->file('avatar')->storeAs('public/images/avatar', $img_name);
+            $images = $request->file('avatar')->storeAs($this->user_path, $img_name);
             $data['avatar'] = $img_name;
-            $path_save = Storage::path ('public/images/avatar/'.$img_name);
+            $path_save = Storage::path ($this->user_path.$img_name);
         }else{
             unset($data['logo']);
             unset($data['photo']);
             unset($data['avatar']);
         }
 
-        if ($exif = @exif_read_data($path_save))
+        if (!isset($path_save)) return $data;
+
+        if ( $exif = @exif_read_data($path_save))
         {
             $image = imagecreatefromstring(file_get_contents($path_save));
             if(!empty($exif['Orientation']))
@@ -60,24 +66,21 @@ class BaseController extends Controller
     public function deleteImageProject($img)
     {
         if (!$img) return;
-        //$path_image = str_replace('storage', 'public', $path);
-        $path_image = 'public/images/project/' . $img;
+        $path_image = $this->project_path . $img;
         Storage::delete($path_image);
     }
 
     public function deleteImageDishe($img)
     {
         if (!$img) return;
-        //$path_image = str_replace('storage', 'public', $path);
-        $path_image = 'public/images/dishe/' . $img;
+        $path_image = $this->dishe_path . $img;
         Storage::delete($path_image);
     }
 
     public function deleteImageUser($img)
     {
         if (!$img) return;
-        //$path_image = str_replace('storage', 'public', $path);
-        $path_image = 'public/images/avatar/' . $img;
+        $path_image = $this->user_path . $img;
         Storage::delete($path_image);
     }
 

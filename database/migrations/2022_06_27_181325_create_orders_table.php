@@ -16,12 +16,10 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedInteger('project_id')->nullable()->default(NULL);
+            $table->foreignId('project_id')->constrained('projects')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedInteger('table_id')->nullable()->default(NULL);
             $table->unsignedInteger('user_id')->nullable()->default(NULL);
-            $table->string('name')->nullable()->default(NULL);
             $table->string('status')->nullable()->default(NULL);
-            $table->decimal('sum', 12, 2)->nullable()->default(NULL);
 
             $table->timestamps();
         });

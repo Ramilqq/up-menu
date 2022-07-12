@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('name')->nullable()->default(NULL);
             $table->tinyInteger('active')->nullable()->default(NULL);
             $table->smallInteger('order')->nullable()->default(NULL);
-            $table->unsignedInteger('menu_id')->nullable()->default(NULL);
+            $table->foreignId('menu_id')->constrained('menus')->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
         });

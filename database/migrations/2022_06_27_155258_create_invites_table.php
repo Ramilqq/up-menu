@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
 
             $table->uuid('uuid')->unique();
-            $table->unsignedInteger('project_id')->nullable()->default(NULL);
+            $table->foreignId('project_id')->constrained('projects')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedInteger('inviter_id')->nullable()->default(NULL);
             $table->unsignedInteger('invitee_id')->nullable()->default(NULL);
             $table->string('type')->nullable()->default(NULL);

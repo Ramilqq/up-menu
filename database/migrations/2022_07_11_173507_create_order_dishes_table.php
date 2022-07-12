@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tables', function (Blueprint $table) {
+        Schema::create('order_dishes', function (Blueprint $table) {
             $table->id();
 
-            $table->uuid('uuid')->unique();
-            $table->foreignId('project_id')->constrained('projects')->onUpdate('cascade')->onDelete('cascade');
-            $table->string('name')->nullable()->default(NULL);
-            $table->tinyInteger('active')->nullable()->default(NULL);
-            $table->smallInteger('order')->nullable()->default(NULL);
+            $table->foreignId('order_id')->constrained('orders')->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedInteger('dishe_id')->nullable()->default(NULL);
             
             $table->timestamps();
         });
@@ -33,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tables');
+        Schema::dropIfExists('order_dishes');
     }
 };

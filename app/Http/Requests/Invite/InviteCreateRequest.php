@@ -23,7 +23,7 @@ class InviteCreateRequest extends FormRequest
             'uuid' => ['required', 'unique:invites,uuid'],
             'project_id' => ['required', 'numeric', 'exists:projects,id'],
             'inviter_id' => ['required', 'numeric', 'exists:users,id'],
-            'invitee_id' => ['required', 'numeric', 'exists:users,id'],
+            'invitee_id' => ['numeric', 'exists:users,id'],
             'type' => ['required', 'string', 'min:1', 'max:64', 
                 request()->user()->role === User::OWNER ? Rule::in([User::ADMIN, User::USER]) : Rule::in([User::USER]),
             ],
@@ -35,6 +35,7 @@ class InviteCreateRequest extends FormRequest
     {
         $this->merge([
             'project_id' => $this->id,
+            'inviter_id' => request()->user()->id,
             'uuid' => Str::uuid()->toString(),
         ]);
     }

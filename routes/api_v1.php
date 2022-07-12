@@ -79,6 +79,10 @@ Route::middleware(['auth:api', 'verified_custom'])->group(function(){
         Route::delete('/orders/{id}', 'destroy')->name('order_destroy');
         Route::patch('/orders/{id}', 'update')->name('order_update');
         Route::put('/orders/{id}', 'replace')->name('order_replace');
+
+        Route::get('/orders/{id}/dishes', 'getDisheOrder')->name('order_dishe_get');
+        Route::delete('/orders/{id}/dishes', 'destroyDisheOrder')->name('order_dishe_destroy');
+        Route::patch('/orders/{id}/dishes', 'updateDisheOrder')->name('order_dishe_update');
     });
     Route::controller(\App\Http\Controllers\OrderController::class)->middleware('admin_protect')->prefix('/')->group(function() {
         Route::patch('/orders/{id}/assignee', 'assignee')->name('order_assignee');
@@ -111,7 +115,7 @@ Route::middleware(['auth:api', 'verified_custom'])->group(function(){
         Route::get('/projects/{id}/employees', 'getUser')->name('project_get_user');
         Route::post('/projects/{id}/table', 'createTable')->name('project_create_table');
         Route::get('/projects/{id}/invites', 'getInvite')->name('project_get_invite');
-        Route::post('/projects/{id}/invites', 'createInvite')->name('project_create_invite');
+        Route::post('/projects/{id}/invite', 'createInvite')->name('project_create_invite');
     });
     Route::controller(\App\Http\Controllers\ProjectController::class)->middleware('owner_protect')->prefix('/')->group(function() {
         Route::get('/projects/{id}', 'show')->name('project_show');

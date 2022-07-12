@@ -90,11 +90,16 @@ class Project extends Model
     static function getTables($id, $filter)
     {
         $limit = request()->limit ?: 10;
-        $tables = Table::query()->where('project_id', $id);
-        if ($filter !== null)
+        $tables = Table::query()->where('tables.project_id', $id)->rightJoin('orders', 'tables.id', '=', 'orders.table_id');
+        if (isset($filter['active']))
         {
-            $tables->where('active', (bool) $filter);
+            $tables->where('tables.active', (bool) $filter['active']);
         }
+        if (isset($filter['status']))
+        {
+            $tables->where('orders.status', $filter['status']);
+        }
+        $tables->select('tables.id','tables.project_id','tables.name','tables.active','orders.status','tables.created_at','tables.updated_at');
         return $tables->simplePaginate($limit) ?: [];
     }
 
