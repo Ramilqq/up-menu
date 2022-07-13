@@ -20,21 +20,22 @@ class OrderCreateRequest extends FormRequest
     {
         return [
             'project_id' => ['required', 'numeric', 'exists:projects,id'],
-            'table_id' => ['required', 'numeric', 'exists:tables,id'],
-            'status' => ['string', 'in:'. Order::NEW.','.Order::WORK.','.Order::CLOSE.','.Order::PAID],
+            'table_id' => ['required', 'numeric', 'exists:tables,id',
+                Rule::unique('orders')->where(function ($query) {
+                    return $query->where('table_id', $this->table_id)->whereIn('status', [Order::CLOSE, Order::PAID]);
+                }),
+            ],
+            'status' => ['required'],
             'dishes_id' => ['required', 'array', 'exists:dishes,id']
         ];
     }
 
     protected function prepareForValidation()
     {
-        $orders = Order::query()->where('table_id', $this->table_id)->whereIn('status', [Order::CLOSE, Order::PAID])->get()->toArray() ? true : false;
-        
-        is_array($this->dishes) ? $dishes = $this->dishes : $dishes = explode (',', $this->dishes);
-
         $this->merge([
             'project_id' => $this->id,
-            'table_id' => $orders ? null : $this->table_id,
+            'table_id' => $this->table_id,
+            'status' =>Order::NEW,
         ]);
     }
 
@@ -57,7 +58,7 @@ class OrderCreateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'table_id.required' => ['Поле table id обязательно для заполнения' , 'Данный стол уже используется']
+            'table_id.unique' => 'Данный стол уже используется',
         ];
     }
 }

@@ -20,7 +20,7 @@ class ModifierCreateRequest extends FormRequest
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'order' => ['numeric', 'min:0', 'max:32767'],
             'active' => ['required', 'boolean'],
-            'price' => ['required', 'numeric'],
+            'price' => ['numeric'],
             'menu_id' => ['required', 'numeric', 'exists:menus,id'],
         ];
     }

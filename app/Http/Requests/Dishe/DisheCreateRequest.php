@@ -21,12 +21,12 @@ class DisheCreateRequest extends FormRequest
     {
         $rules = [
             'menu_id' => ['required', 'numeric', 'exists:menus,id'],
-            'category_id' => ['required', 'string', 'exists:categories,id'],
+            'category_id' => ['string', 'exists:categories,id'],
             'name' => ['required', 'string', 'min:1', 'max:32'],
             'description' => ['string', 'min:1', 'max:255'],
             'price' => ['required', 'numeric'],
-            'photo' => ['required', 'image', 'dimensions:max_width=1000,max_height=1000'],
-            'order' => ['required', 'numeric', 'min:0', 'max:32767'],
+            'photo' => ['image', 'dimensions:max_width=1000,max_height=1000'],
+            'order' => ['numeric', 'min:0', 'max:32767'],
             'active' => ['required', 'boolean'],
             'kbju' => ['numeric'],
             'weight' => [ 'numeric'],

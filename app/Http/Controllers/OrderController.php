@@ -117,7 +117,7 @@ class OrderController extends Controller
         {
             $dishes[] = (bool) OrderDishe::query()->where('dishe_id', $dish)->where('order_id', $id)->delete();
         }
-        return response()->json(['success' => true, 'message' => 'Заказ обнавлен', 'data' => $dishes]);
+        return response()->json(['success' => true, 'message' => 'Заказ обновлен', 'data' => $dishes]);
     }
 
     public function updateDisheOrder(OrderDisheRequest $request, $id)
@@ -128,7 +128,7 @@ class OrderController extends Controller
         {
             $dishes[] = OrderDishe::create(['order_id'=> $id, 'dishe_id'=> $dish]);
         }
-        return response()->json(['success' => true, 'message' => 'Заказ обнавлен', 'data' => $dishes]);
+        return response()->json(['success' => true, 'message' => 'Заказ обновлен', 'data' => $dishes]);
     }
 
 }

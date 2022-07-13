@@ -35,7 +35,7 @@ class UserCreateRequest extends FormRequest
     protected function prepareForValidation()
     {
         $uuid = $this->uuid;
-        if (!$invite = Invite::query()->where('uuid', $uuid)->first()) return;
+        if (!$invite = Invite::query()->where('uuid', $uuid)->where('invitee_id', null)->first()) return;
 
         $this->merge([
             //'email' => $invite->email ?: '',

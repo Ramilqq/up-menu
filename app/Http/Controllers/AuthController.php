@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\User\UserCreateRequest;
+use App\Models\Invite;
 use App\Models\ProjectUser;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -75,6 +76,10 @@ class AuthController extends Controller
             return response()->json(['success' => false], 400);
         }
         ProjectUser::create(['user_id'=>$user->id, 'project_id'=>$data['project_id']]);
+        $invite = Invite::query()->where('uuid', $uuid)->where('invitee_id', null)->first();
+        $invite->invitee_id = $user->id;
+        $invite->save();
+        
         event(new \Illuminate\Auth\Events\Registered($user));
         return response()->json($user, 200);
     }
