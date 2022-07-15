@@ -97,7 +97,9 @@ class Project extends Model
         }
         if (isset($filter['status']))
         {
-            $tables->where('orders.status', $filter['status']);
+            if (!in_array($filter['status'] , [Order::NEW, Order::WORK, Order::CLOSE, Order::PAID])) {
+                return ['message' => 'Статус не найден.'];
+            }
         }
         $tables->select('tables.id','tables.project_id','tables.name','tables.active','orders.status','tables.created_at','tables.updated_at');
         return $tables->simplePaginate($limit) ?: [];

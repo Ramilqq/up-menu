@@ -35,7 +35,14 @@ class UserCreateRequest extends FormRequest
     protected function prepareForValidation()
     {
         $uuid = $this->uuid;
-        if (!$invite = Invite::query()->where('uuid', $uuid)->where('invitee_id', null)->first()) return;
+        if (!$invite = Invite::query()->where('uuid', $uuid)->first())
+        {
+            $this->failedRequest('Инвайта не существует.');
+        }
+        if ($invite->invitee_id)
+        {
+            $this->failedRequest('Инвайт использован.');
+        }
 
         $this->merge([
             //'email' => $invite->email ?: '',
@@ -59,6 +66,13 @@ class UserCreateRequest extends FormRequest
             'success'   => false,
             'message'   => 'Authorization errors',
           ])->setStatusCode(401));
+    }
+
+    public function failedRequest($msg) {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => $msg,
+          ])->setStatusCode(400));
     }
 
     public function deCryptUuid($uuid)

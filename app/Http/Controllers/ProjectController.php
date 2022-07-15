@@ -144,7 +144,8 @@ class ProjectController extends BaseController
     {
         if (!TablePolicy::requestGet($id)) return response()->json([]);
         $filter = $request->all();
-        return  Project::getTables($id, $filter);
+        $data =  Project::getTables($id, $filter);
+        return response()->json($data);
     }
 
     public function createTable(TableCreateRequest $request, $id)
